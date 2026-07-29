@@ -1,0 +1,364 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+// --- Variables ---
+
+$reader-max-width: 42em;
+$reader-padding-x: 2.5em;
+$reader-padding-y: 2em;
+$reader-body: #fdf6e3;
+$reader-bg: #fdf6e3;
+//$reader-bg: white;
+$reader-border: #93a1a1;
+$reader-text: #002b36;
+$reader-text-muted: #586e75;
+$reader-accent: #ce2714;
+$reader-font: "EB Garamond", Georgia, "Times New Roman", serif;
+$header-font: "Jost", Arial, sans;
+$reader-transition: transform 0.3s ease;
+
+// --- Base reset ---
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: $reader-body;
+    font-family: $reader-font;
+    color: $reader-text;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    // Disable text selection globally for a native app feel
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+// --- Reader layout ---
+
+.reader {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    align-items: center;
+}
+
+// --- Viewport (the paginated container) ---
+
+.reader__viewport {
+    width: 100%;
+    max-width: $reader-max-width;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background-color: $reader-bg;    
+}
+
+// --- Content (multi-column reflow) ---
+
+.reader__content {
+    height: 100%;
+    column-gap: 0;
+    column-fill: auto;
+    transition: $reader-transition;
+    will-change: transform;
+
+    // Typography
+    font-size: 1.125rem;
+    line-height: 170%;
+    text-align: justify;
+    hyphens: auto;
+}
+
+// The content shouldn't be padded at the top when the screen is small to
+// save screen real estate.
+@media screen and (min-width: 60em) {
+    .reader__viewport {
+        padding: 2em 0em 2em 0em;
+    }
+}
+
+@media screen and (max-width: 60em) {
+    .reader__viewport {
+        padding: 1em 0em 1em 0em;
+    }
+}
+
+// --- Content sections ---
+//
+// Each content item (story, TOC, image, etc.) is wrapped in a
+// .content-section. Horizontal padding is applied here so each
+// column has its own text margins.
+
+.content-section {    
+    padding-left: $reader-padding-x;
+    padding-right: $reader-padding-x;
+    padding-bottom: $reader-padding-y;
+    padding-top: $reader-padding-y;
+    min-height: 100%;
+
+    // Force every section after the first to start on a new page
+    & + .content-section {
+        break-before: column;
+    }
+
+    h1, h2, h3 {
+        color: $reader-accent;
+        font-family: $header-font;
+        text-transform: uppercase;
+        font-weight: normal;
+        text-align: center;
+        break-after: avoid;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5em;
+
+        // Target styling for links
+        :target & {
+            animation: target-flash 1s ease;
+        }
+    }
+
+    // Used in welcome section for title headings
+    h3 {
+        margin-top: 1em;
+        a {
+            font-weight: normal;
+        }
+    }
+    
+    h3 + p {
+        text-align: center;
+        font-size: .9em;
+        font-family: $header-font;
+        color: $reader-text-muted;
+    }
+
+    p {
+        orphans: 2;
+        widows: 2;
+    }
+
+    p + p {
+        text-indent: 1.5em;
+    }
+    
+    ul {
+        margin: 1em 0em 1em 1em;
+    }
+    
+    a {
+        text-decoration: none;
+        font-weight: bold;
+        color: $reader-text;
+    }
+    
+    a:hover {
+        text-decoration: underline;        
+    }
+    
+    a:visited {
+        color: $reader-text;
+    }
+    
+    code {
+        	white-space: pre-line;
+        	line-height: 140%;
+        	font-family: "Courier Prime";
+        	font-size: .9em;
+    }
+    	
+    p + pre,
+    pre + p,
+    pre + pre {
+        	margin-top: 1em;
+    }    
+    
+    .no-first-line-indent p {
+        text-indent: 0em!important;
+    }
+    
+    .space-paragraphs p + p {
+        margin-top: 1em;
+    }
+    
+    .big-letter {
+        font-size: 3.4em;
+        float: left;
+        line-height: 1;
+        margin-right: 0.1em;
+        margin-bottom: -.2em;
+        color: $reader-accent;
+    }    
+
+    hr {
+        border: none;
+        text-align: center;
+        margin: 2em 0;
+        
+        &::before {
+            content: "𖧹";
+            color: $reader-text-muted;
+        }
+    }
+
+    blockquote {
+        margin: 1.5em 0;
+        border-left: 3px solid lighten($reader-accent, 20%);
+        font-style: italic;
+        color: lighten($reader-text, 15%);
+
+        padding-left: calc(#{$reader-padding-x} - 3px);
+        padding-right: $reader-padding-x;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        break-inside: avoid;
+    }
+
+    // Prevent awkward breaks for short elements
+    h1, h2, h3, blockquote, img {
+        break-inside: avoid-column;
+    }
+    
+
+    h1:after {
+        	display: block;
+        	margin-top: 2em;
+    }
+    
+    h1#contents:after {
+    	content: url("griffinfly.svg");
+    }
+        
+    h1#the-cephalopod:after {
+    	content: url("the-cephalopod.svg");
+    }
+    
+    h1#such-was-not-the-way-things-were:after {
+    	content: url("such-was-not-the-way-things-were.svg");
+    }
+}
+
+// --- Image sections ---
+
+.content-section--image {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    padding: 0em;
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border: solid 1px $reader-border;
+    }
+}
+
+// --- Slideshow ---
+
+.slideshow {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slideshow__slide {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 2s ease;
+
+    &--active {
+        opacity: 1;
+    }
+}
+
+// --- Target flash animation ---
+
+@keyframes target-flash {
+    0% { background: rgba($reader-accent, 0.2); }
+    100% { background: transparent; }
+}
+
+// --- Controls (bottom bar) ---
+
+.reader__controls {
+    width: 100%;
+    max-width: $reader-max-width;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5em;
+    padding: 0.75em 1em;
+    background: transparent;
+    user-select: none;
+}
+
+.reader__nav {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $reader-text-muted;
+    cursor: pointer;
+    padding: 0.25em 0.5em;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+        color: $reader-accent;
+    }
+
+    &:active:not(:disabled) {
+        opacity: 0.6;
+    }
+
+    &:disabled {
+        opacity: 0.25;
+        cursor: default;
+    }
+
+    &:focus {
+        outline: 2px solid $reader-accent;
+        outline-offset: 2px;
+    }
+}
+
+.reader__nav#end-page {
+    opacity: 0;
+}
+
+.reader__page-indicator {
+    font-size: 0.8rem;
+    color: $reader-text-muted;
+    font-family: sans-serif;
+    min-width: 4em;
+    text-align: center;
+}

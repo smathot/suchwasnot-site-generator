@@ -1,0 +1,404 @@
+// E-Reader Pagination Controller
+// Uses CSS multi-column layout for content reflow, with JS for navigation.
+//
+// Key fix: CSS column-width does NOT accept percentage values.
+// We must set it dynamically in JS to the viewport width in pixels so the
+// browser creates exactly the right number of columns (pages).
+
+(function () {
+    "use strict";
+
+    const viewport = document.querySelector(".reader__viewport");
+    const content = document.getElementById("reader-content");
+    const homeBtn = document.getElementById("home-page");
+    const prevBtn = document.getElementById("prev-page");
+    const nextBtn = document.getElementById("next-page");
+    const indicator = document.getElementById("page-indicator");
+
+    let currentPage = 0;
+    let pageCount = 1;
+    let pageWidth = 0;
+    let isAnimating = false;
+    let initialPositionHandled = false;
+
+    // --- Cookie helpers ---
+
+    var COOKIE_NAME = "readerPos";
+    var COOKIE_DAYS = 365;
+
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return decodeURIComponent(c.substring(nameEQ.length));
+            }
+        }
+        return null;
+    }
+
+    // --- Position persistence ---
+    //
+    // We store the reading position as a fraction of total content width
+    // (0.0 to 1.0), not as a page number. This way, if the window is resized
+    // or fonts load differently, the fraction still points to roughly the
+    // same spot in the text stream.
+
+    function savePosition() {
+        if (pageWidth === 0 || pageCount <= 1) return;
+        var fraction = (currentPage * pageWidth) / content.scrollWidth;
+        setCookie(COOKIE_NAME, fraction, COOKIE_DAYS);
+    }
+
+    function restoreFromCookie() {
+        var raw = getCookie(COOKIE_NAME);
+        if (raw === null) return null;
+        var fraction = parseFloat(raw);
+        if (isNaN(fraction) || fraction < 0 || fraction > 1) return null;
+        var pixelPos = fraction * content.scrollWidth;
+        var page = Math.round(pixelPos / pageWidth);
+        return Math.max(0, Math.min(page, pageCount - 1));
+    }
+
+    // --- Slideshow management ---
+
+    var slideshows = [];
+
+    function initSlideshows() {
+        slideshows = [];
+        var containers = document.querySelectorAll(".slideshow");
+        for (var i = 0; i < containers.length; i++) {
+            var slides = containers[i].querySelectorAll(".slideshow__slide");
+            if (slides.length <= 1) continue;
+
+            var slideshow = {
+                slides: slides,
+                current: 0,
+                timer: null,
+            };
+            slideshows.push(slideshow);
+
+            // Start the slideshow (advance from first slide)
+            advanceSlideshow(slideshow);
+        }
+    }
+
+    function advanceSlideshow(slideshow) {
+        // If already on last slide, stop
+        if (slideshow.current >= slideshow.slides.length - 1) return;
+
+        var duration = parseFloat(
+            slideshow.slides[slideshow.current].getAttribute("data-duration")
+        );
+        if (!duration || duration <= 0) duration = 2;
+
+        slideshow.timer = setTimeout(function () {
+            // Deactivate current slide
+            slideshow.slides[slideshow.current].classList.remove("slideshow__slide--active");
+
+            // Activate next slide
+            slideshow.current++;
+            slideshow.slides[slideshow.current].classList.add("slideshow__slide--active");
+
+            // Continue if not on last slide
+            if (slideshow.current < slideshow.slides.length - 1) {
+                advanceSlideshow(slideshow);
+            }
+        }, duration * 1000);
+    }
+
+    function recalculate() {
+        // Measure the viewport width — this is our initial "page width"
+        // estimate.
+        pageWidth = viewport.clientWidth;
+        if (pageWidth === 0) return;
+
+        // Set column-width to exactly the viewport width in pixels.
+        content.style.columnWidth = pageWidth + "px";
+
+        // Wait for the browser to reflow, then measure
+        requestAnimationFrame(function () {
+            // Compute an approximate page count using our initial pageWidth
+            // estimate. Use round instead of ceil to avoid creating a
+            // spurious extra blank page from sub-pixel rounding noise.
+            pageCount = Math.max(1, Math.round(content.scrollWidth / pageWidth));
+
+            // Refine pageWidth to match the browser's ACTUAL column width.
+            // The column-width property is only a suggestion; the browser
+            // may use a slightly different value internally. Dividing the
+            // real scrollWidth by pageCount gives us the true per-page width,
+            // so our transforms align perfectly with column boundaries.
+            if (pageCount > 0) {
+                pageWidth = content.scrollWidth / pageCount;
+            }
+
+            if (currentPage >= pageCount) {
+                currentPage = pageCount - 1;
+            }
+
+            applyTransform();
+            updateIndicator();
+            updateButtons();
+
+            // --- Initial position restore (runs only once) ---
+            if (!initialPositionHandled) {
+                initialPositionHandled = true;
+
+                // Priority: cookie > URL hash > start
+                var restoredPage = restoreFromCookie();
+                if (restoredPage !== null) {
+                    goToPage(restoredPage);
+                } else if (location.hash) {
+                    goToAnchor(location.hash);
+                }
+
+                // Clear any URL hash so it doesn't persist across reloads.
+                // replaceState doesn't trigger a hashchange event.
+                if (location.hash) {
+                    history.replaceState(
+                        null, null,
+                        window.location.pathname + window.location.search
+                    );
+                }
+            }
+
+            savePosition();
+        });
+    }
+
+    function applyTransform() {
+        content.style.transform = "translateX(" + (-currentPage * pageWidth) + "px)";
+    }
+
+    function updateIndicator() {
+        indicator.textContent = (currentPage + 1) + " / " + pageCount;
+    }
+
+    function updateButtons() {
+        prevBtn.disabled = currentPage <= 0;
+        nextBtn.disabled = currentPage >= pageCount - 1;
+    }
+
+    function goToPage(n) {
+        if (isAnimating) return;
+        var target = Math.max(0, Math.min(n, pageCount - 1));
+        if (target === currentPage) return;
+
+        isAnimating = true;
+        currentPage = target;
+        applyTransform();
+
+        setTimeout(function () {
+            isAnimating = false;
+        }, 300);
+
+        updateIndicator();
+        updateButtons();
+        savePosition();
+    }
+
+    function goToAnchor(hash) {
+        if (!hash || hash === "#" || pageWidth === 0) return;
+
+        var id = hash.substring(1);
+        var el = document.getElementById(id);
+        if (!el) return;
+
+        // Temporarily reset the transform so getBoundingClientRect returns
+        // the element's true position in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var elRect = el.getBoundingClientRect();
+        var contentRect = content.getBoundingClientRect();
+        var offset = elRect.left - contentRect.left;
+        var page = Math.floor(offset / pageWidth);
+
+        // Restore the transform
+        applyTransform();
+
+        if (page < 0) page = 0;
+        if (page >= pageCount) page = pageCount - 1;
+
+        goToPage(page);
+    }
+
+    function goToHome() {
+        goToPage(0);
+    }
+
+    function nextPage() {
+        goToPage(currentPage + 1);
+    }
+
+    function prevPage() {
+        goToPage(currentPage - 1);
+    }
+
+    // --- Button clicks ---
+    homeBtn.addEventListener("click", goToHome);
+    prevBtn.addEventListener("click", prevPage);
+    nextBtn.addEventListener("click", nextPage);
+
+    // --- Keyboard navigation ---
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+            e.preventDefault();
+            nextPage();
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+            e.preventDefault();
+            prevPage();
+        } else if (e.key === "Home") {
+            e.preventDefault();
+            goToPage(0);
+        } else if (e.key === "End") {
+            e.preventDefault();
+            goToPage(pageCount - 1);
+        }
+    });
+
+    // --- Anchor link click interception ---
+    // Intercept clicks on in-page anchor links (href="#...") to prevent the
+    // browser's default scroll-to behavior, which interferes with our
+    // transform-based pagination. We navigate to the correct page and save
+    // the position in a cookie — the URL hash is NOT updated.
+    content.addEventListener("click", function (e) {
+        var link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        var hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+
+        e.preventDefault();
+        goToAnchor(hash);
+    });
+
+    // --- Hash change (external sources only) ---
+    // Handles cases where the hash is changed by something other than our
+    // own click handler — e.g. the user manually edits the URL, or navigates
+    // here from an external link with a hash.
+    window.addEventListener("hashchange", function () {
+        if (location.hash) {
+            goToAnchor(location.hash);
+        }
+    });
+
+    // --- Click / tap to advance ---
+    //
+    // A click or tap on the viewport that is NOT part of a drag/swipe
+    // advances to the next page. The dragOccurred flag is set by the
+    // mouse/touch handlers below when a drag or swipe is detected, so
+    // this handler can safely skip those cases.
+    var dragOccurred = false;
+
+    viewport.addEventListener("click", function (e) {
+        if (dragOccurred) return;
+        // Don't advance when clicking links (handled by anchor interception)
+        if (e.target.closest("a")) return;
+        nextPage();
+    });
+
+    // --- Touch / swipe navigation ---
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchActive = false;
+
+    viewport.addEventListener("touchstart", function (e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchActive = true;
+        dragOccurred = false;
+    }, { passive: true });
+
+    viewport.addEventListener("touchend", function (e) {
+        if (!touchActive) return;
+        touchActive = false;
+
+        var endX = e.changedTouches[0].clientX;
+        var endY = e.changedTouches[0].clientY;
+        var dx = endX - touchStartX;
+        var dy = endY - touchStartY;
+
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            dragOccurred = true;
+            if (dx < 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+        }
+    }, { passive: true });
+
+    // --- Mouse drag navigation ---
+    var mouseStartX = 0;
+    var mouseActive = false;
+
+    viewport.addEventListener("mousedown", function (e) {
+        if (e.target.closest(".reader__controls")) return;
+        mouseStartX = e.clientX;
+        mouseActive = true;
+        dragOccurred = false;
+    });
+
+    document.addEventListener("mouseup", function (e) {
+        if (!mouseActive) return;
+        mouseActive = false;
+
+        var dx = e.clientX - mouseStartX;
+        if (Math.abs(dx) > 50) {
+            dragOccurred = true;
+            if (dx < 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+        }
+    });
+
+    // --- Mouse wheel navigation ---
+    var wheelTimeout = null;
+    viewport.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        if (isAnimating || wheelTimeout) return;
+
+        var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (delta !== 0) {
+            if (delta > 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+            wheelTimeout = setTimeout(function () {
+                wheelTimeout = null;
+            }, 400);
+        }
+    }, { passive: false });
+
+    // --- Window resize: recalculate pages ---
+    var resizeTimeout = null;
+    window.addEventListener("resize", function () {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(recalculate, 150);
+    });
+
+    // --- Initialise ---
+    initSlideshows();
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(recalculate);
+    } else {
+        setTimeout(recalculate, 100);
+    }
+
+    recalculate();
+})();

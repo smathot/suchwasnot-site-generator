@@ -271,9 +271,19 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
                 })
             print(f"  ✓ {slug} ({source})")
 
+    # Build TOC entries from sections that have an explicit title in content.yaml
+    toc_entries = []
+    for slug, entry in config.items():
+        if isinstance(entry, dict) and "title" in entry:
+            toc_entries.append({
+                "slug": slug,
+                "title": entry["title"],
+            })
+
     # Render the single combined page
     html = template.render(
         sections=sections,
+        toc_entries=toc_entries,
         compiled_css=compiled_css,
         reader_js=reader_js,
     )

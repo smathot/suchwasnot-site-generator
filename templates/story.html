@@ -21,14 +21,28 @@
                 </div>
                 {% endfor %}
             </div>
+
+            {# Table of Contents modal — covers the reader viewport #}
+            <div class="toc-modal" id="toc-modal" hidden>
+                <button class="toc-modal__close" id="toc-close" aria-label="Close table of contents">&#10005;</button>
+                <nav class="toc-modal__nav">
+                    <h2 class="toc-modal__title">Contents</h2>
+                    <ul class="toc-modal__list">
+                        {% for entry in toc_entries %}
+                        <li class="toc-modal__item">
+                            <a href="#{{ entry.slug }}" class="toc-modal__link">{{ entry.title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
         </div>
 
         <div class="reader__controls">
-            <button class="reader__nav reader__nav--home" id="home-page" aria-label="Home">&#8249;&#8249;</button>
+            <button class="reader__nav reader__nav--contents" id="toc" aria-label="Contents">CONTENTS</button>
             <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#8249;</button>
             <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
             <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#8250;</button>
-            <button class="reader__nav reader__nav--end" id="end-page" aria-label="Home">&#8250;&#8250;</button>
         </div>
     </div>
 

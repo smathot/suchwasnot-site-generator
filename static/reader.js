@@ -10,16 +10,73 @@
 
     const viewport = document.querySelector(".reader__viewport");
     const content = document.getElementById("reader-content");
-    const homeBtn = document.getElementById("home-page");
     const prevBtn = document.getElementById("prev-page");
     const nextBtn = document.getElementById("next-page");
     const indicator = document.getElementById("page-indicator");
+    const tocBtn = document.getElementById("toc");
+    const tocModal = document.getElementById("toc-modal");
+    const tocClose = document.getElementById("toc-close");
 
     let currentPage = 0;
     let pageCount = 1;
     let pageWidth = 0;
     let isAnimating = false;
     let initialPositionHandled = false;
+
+    // --- TOC modal ---
+
+    function openToc() {
+        tocModal.hidden = false;
+    }
+
+    function closeToc() {
+        tocModal.hidden = true;
+    }
+
+    function isTocOpen() {
+        return !tocModal.hidden;
+    }
+    
+    function toggleToc() {
+        if (isTocOpen()) {
+            closeToc();
+        } else {
+            openToc();
+        }
+    }
+
+    tocBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleToc();
+    });
+
+    tocClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeToc();
+    });
+
+    // Close modal when Escape is pressed
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isTocOpen()) {
+            e.preventDefault();
+            closeToc();
+        }
+    });
+
+    // Handle TOC link clicks: navigate to the section and close the modal
+    tocModal.addEventListener("click", function (e) {
+        var link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        var hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+
+        e.preventDefault();
+        closeToc();
+        goToAnchor(hash);
+    });
 
     // --- Cookie helpers ---
 
@@ -151,7 +208,7 @@
             updateIndicator();
             updateButtons();
 
-            // --- Initial position restore (runs only once) ---
+            // --- Initial position restore (runs only once) --->
             if (!initialPositionHandled) {
                 initialPositionHandled = true;
 
@@ -246,12 +303,15 @@
     }
 
     // --- Button clicks ---
-    homeBtn.addEventListener("click", goToHome);
     prevBtn.addEventListener("click", prevPage);
     nextBtn.addEventListener("click", nextPage);
 
     // --- Keyboard navigation ---
     document.addEventListener("keydown", function (e) {
+        // Skip keyboard navigation when TOC modal is open (except Escape,
+        // which is handled by its own listener above).
+        if (isTocOpen()) return;
+
         if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
             e.preventDefault();
             nextPage();
@@ -305,6 +365,8 @@
         if (dragOccurred) return;
         // Don't advance when clicking links (handled by anchor interception)
         if (e.target.closest("a")) return;
+        // Don't advance when the TOC modal is open
+        if (isTocOpen()) return;
         nextPage();
     });
 
@@ -314,6 +376,7 @@
     var touchActive = false;
 
     viewport.addEventListener("touchstart", function (e) {
+        if (isTocOpen()) return;
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchActive = true;
@@ -344,6 +407,7 @@
     var mouseActive = false;
 
     viewport.addEventListener("mousedown", function (e) {
+        if (isTocOpen()) return;
         if (e.target.closest(".reader__controls")) return;
         mouseStartX = e.clientX;
         mouseActive = true;
@@ -368,6 +432,7 @@
     // --- Mouse wheel navigation ---
     var wheelTimeout = null;
     viewport.addEventListener("wheel", function (e) {
+        if (isTocOpen()) return;
         e.preventDefault();
         if (isAnimating || wheelTimeout) return;
 

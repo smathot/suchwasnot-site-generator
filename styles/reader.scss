@@ -6,15 +6,14 @@
 $reader-max-width: 42em;
 $reader-padding-x: 2.5em;
 $reader-padding-y: 2em;
-$reader-body: #fdf6e3;
-$reader-bg: #fdf6e3;
-//$reader-bg: white;
+$reader-body: #fdf9ed;
 $reader-border: #93a1a1;
 $reader-text: #002b36;
 $reader-text-muted: #586e75;
 $reader-accent: #ce2714;
 $reader-font: "EB Garamond", Georgia, "Times New Roman", serif;
 $header-font: "Jost", Arial, sans;
+$footer-font: $header-font;
 $reader-transition: transform 0.3s ease;
 
 // --- Base reset ---
@@ -61,7 +60,6 @@ body {
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    background-color: $reader-bg;    
 }
 
 // --- Content (multi-column reflow) ---
@@ -201,7 +199,19 @@ body {
         margin-right: 0.1em;
         margin-bottom: -.2em;
         color: $reader-accent;
-    }    
+    }
+    
+    .right-note {
+        font-family: $header-font;
+        color: $reader-text-muted;
+        font-size: .8em;
+        text-align: right;
+        margin-top: 0em!important;
+    }
+    
+    .right-note + p {
+         margin-top: 0em!important;
+    }
 
     hr {
         border: none;
@@ -321,28 +331,52 @@ body {
     padding: 0.75em 1em;
     background: transparent;
     user-select: none;
+    font-family: $footer-font;
+    color: $reader-text-muted;
+    font-size: .8rem;
+    button {
+        color: $reader-text-muted;
+        font-size: .8rem;
+        border: none;
+        background: none;
+    }    
 }
 
-.reader__nav {
+
+// --- Table of Contents modal ---
+
+.toc-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba($reader-body, 0.97);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2em;
+    overflow-y: auto;
+
+    &[hidden] {
+        display: none;
+    }
+}
+
+.toc-modal__close {
+    position: absolute;
+    top: 1em;
+    right: 1em;
     background: none;
     border: none;
     font-size: 1.5rem;
     color: $reader-text-muted;
     cursor: pointer;
-    padding: 0.25em 0.5em;
-    transition: color 0.2s ease, opacity 0.2s ease;
+    padding: 0.5em;
+    line-height: 1;
+    transition: color 0.2s ease;
 
-    &:hover:not(:disabled) {
+    &:hover {
         color: $reader-accent;
-    }
-
-    &:active:not(:disabled) {
-        opacity: 0.6;
-    }
-
-    &:disabled {
-        opacity: 0.25;
-        cursor: default;
     }
 
     &:focus {
@@ -351,14 +385,50 @@ body {
     }
 }
 
-.reader__nav#end-page {
-    opacity: 0;
+.toc-modal__nav {
+    max-width: 24em;
+    width: 100%;
 }
 
-.reader__page-indicator {
-    font-size: 0.8rem;
-    color: $reader-text-muted;
-    font-family: sans-serif;
-    min-width: 4em;
+.toc-modal__title {
+    font-family: $header-font;
+    font-size: 1.25rem;
+    color: $reader-accent;
+    text-transform: uppercase;
     text-align: center;
+    margin-bottom: 2em;
+    font-weight: normal;
+}
+
+.toc-modal__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-modal__item {
+    text-align: center;
+    margin-bottom: 1em;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.toc-modal__link {
+    font-family: $header-font;
+    color: $reader-text;
+    text-decoration: none;
+    font-weight: normal;
+    transition: color 0.2s ease;
+    
+    &:hover {
+        color: $reader-accent;
+        text-decoration: underline;
+    }
+
+    &:focus {
+        outline: 2px solid $reader-accent;
+        outline-offset: 4px;
+    }
 }

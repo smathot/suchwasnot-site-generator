@@ -4,8 +4,10 @@
 // --- Variables ---
 
 $reader-max-width: 42em;
-$reader-padding-x: 2.5em;
-$reader-padding-y: 2em;
+$reader-padding-x-wide: 0em;
+$reader-padding-y-wide: 2em;
+$reader-padding-x-narrow: 1em;
+$reader-padding-y-narrow: 2em;
 $reader-body: #fdf9ed;
 $reader-border: #93a1a1;
 $reader-text: #002b36;
@@ -80,16 +82,34 @@ body {
 
 // The content shouldn't be padded at the top when the screen is small to
 // save screen real estate.
-@media screen and (min-width: 60em) {
+@media screen and (min-width: 45em) {
     .reader__viewport {
         padding: 1em 0em 1em 0em;
     }
+    
+    .content-section {
+        padding: $reader-padding-y-wide $reader-padding-x-wide ;
+    }
+        
+    blockquote {
+        padding-left: calc(#{$reader-padding-x-wide} - 3px);
+        padding-right: $reader-padding-x-wide;
+    }          
 }
 
-@media screen and (max-width: 60em) {
+@media screen and (max-width: 45em) {
     .reader__viewport {
         padding: 0em
     }
+    
+    .content-section {
+        padding: $reader-padding-y-narrow $reader-padding-x-narrow;
+    }
+        
+    blockquote {
+        padding-left: calc(#{$reader-padding-x-narrow} - 3px);
+        padding-right: $reader-padding-x-narrow;
+    }          
 }
 
 // --- Content sections ---
@@ -99,10 +119,6 @@ body {
 // column has its own text margins.
 
 .content-section {    
-    padding-left: $reader-padding-x;
-    padding-right: $reader-padding-x;
-    padding-bottom: $reader-padding-y;
-    padding-top: $reader-padding-y;
     min-height: 100%;
 
     // Force every section after the first to start on a new page
@@ -229,9 +245,6 @@ body {
         border-left: 3px solid lighten($reader-accent, 20%);
         font-style: italic;
         color: lighten($reader-text, 15%);
-
-        padding-left: calc(#{$reader-padding-x} - 3px);
-        padding-right: $reader-padding-x;
     }
 
     img {
@@ -344,6 +357,26 @@ body {
 
 .fully-transparent {
     opacity: 0%;
+}
+
+// --- Story progress bar ---
+
+.story-progress {
+    width: 100%;
+    max-width: $reader-max-width;
+    height: 2px;
+    background: transparent;
+    position: relative;
+}
+
+.story-progress__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: $reader-text-muted;
+    transition: width 0.3s ease;
 }
 
 // --- Table of Contents modal ---

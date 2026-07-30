@@ -12,10 +12,13 @@
 </head>
 <body>
     <div id="reader" class="reader">
-        <div class="reader__controls">
-            <span class="reader__page-title" id="page-title">SUCHWASNOT</span>            
+        <div class="story-progress" id="story-progress">
+            <div class="story-progress__fill" id="story-progress-fill"></div>
         </div>
-            
+        <div class="reader__controls reader__controls--top">
+            <span class="reader__page-title" id="page-title">SUCHWASNOT</span>
+        </div>
+
         <div class="reader__viewport">            
             <div class="reader__content" id="reader-content">
                 {% for section in sections %}

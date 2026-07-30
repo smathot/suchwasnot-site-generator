@@ -14,6 +14,7 @@
     const nextBtn = document.getElementById("next-page");
     const indicator = document.getElementById("page-indicator");
     const pageTitleEl = document.getElementById("page-title");
+    const storyProgressFill = document.getElementById("story-progress-fill");
     const tocBtn = document.getElementById("toc");
     const tocModal = document.getElementById("toc-modal");
     const tocClose = document.getElementById("toc-close");
@@ -209,6 +210,7 @@
             updateIndicator();
             updateButtons();
             updatePageTitle();
+            updateStoryProgress();
 
             // --- Initial position restore (runs only once) --->
             if (!initialPositionHandled) {
@@ -254,8 +256,9 @@
     // Shows the title of the story the user is currently reading in the
     // #page-title span. The "current story" is the last H1 that appears
     // on or before the current page. When the H1 itself is visible on the
-    // current page, the span is cleared to avoid showing the title twice.
-    // If no H1 precedes the current page, the span is also cleared.
+    // current page, the span is made transparent (but still occupies space)
+    // to avoid showing the title twice. If no H1 precedes the current page,
+    // the default book title is shown transparently.
 
     function updatePageTitle() {
         if (!pageTitleEl) return;
@@ -279,7 +282,7 @@
                 titleText = headings[i].textContent;
                 titleHidden = false;
             } else if (h1Page === currentPage) {
-                // H1 is visible on the current page — clear to avoid duplication
+                // H1 is visible on the current page — transparent to avoid duplication
                 titleText = headings[i].textContent;
                 titleHidden = true;
                 break;
@@ -294,10 +297,67 @@
 
         pageTitleEl.textContent = titleText.toUpperCase();
         if (titleHidden) {
+            storyProgressFill.classList.add("fully-transparent");
             pageTitleEl.classList.add("fully-transparent");
         } else {
+            storyProgressFill.classList.remove("fully-transparent");
             pageTitleEl.classList.remove("fully-transparent");
         }
+    }
+
+    // --- Story progress bar ---
+    //
+    // Fills the #story-progress bar to show how far along the current story
+    // we are. The "current story" starts at the page of the last H1 on or
+    // before the current page, and ends at the page before the next H1 (or
+    // the last page if there is no next H1). If there is no preceding H1,
+    // the bar is empty.
+
+    function updateStoryProgress() {
+        if (!storyProgressFill) return;
+        if (pageWidth === 0) return;
+
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var contentRect = content.getBoundingClientRect();
+        var headings = content.querySelectorAll("h1");
+
+        var startPage = -1;
+        var endPage = pageCount - 1;
+
+        for (var i = 0; i < headings.length; i++) {
+            var h1Rect = headings[i].getBoundingClientRect();
+            var h1Left = h1Rect.left - contentRect.left;
+            var h1Page = Math.floor(h1Left / pageWidth);
+
+            if (h1Page <= currentPage) {
+                // This H1 is on or before the current page — it's our story start
+                startPage = h1Page;
+            } else {
+                // This H1 is on a future page — the story ends just before it
+                endPage = h1Page - 1;
+                break;
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+
+        var progress = 0;
+
+        if (startPage >= 0) {
+            if (endPage <= startPage) {
+                // Single-page story — we're on it, so 100%
+                progress = 100;
+            } else {
+                progress = ((currentPage - startPage) / (endPage - startPage)) * 100;
+                progress = Math.max(0, Math.min(100, progress));
+            }
+        }
+
+        storyProgressFill.style.width = progress + "%";
     }
 
     function goToPage(n) {
@@ -309,6 +369,7 @@
         currentPage = target;
         applyTransform();
         updatePageTitle();
+        updateStoryProgress();
 
         setTimeout(function () {
             isAnimating = false;

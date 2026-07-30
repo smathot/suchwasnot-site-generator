@@ -82,13 +82,13 @@ body {
 // save screen real estate.
 @media screen and (min-width: 60em) {
     .reader__viewport {
-        padding: 2em 0em 2em 0em;
+        padding: 1em 0em 1em 0em;
     }
 }
 
 @media screen and (max-width: 60em) {
     .reader__viewport {
-        padding: 1em 0em 1em 0em;
+        padding: 0em
     }
 }
 
@@ -342,6 +342,9 @@ body {
     }    
 }
 
+.fully-transparent {
+    opacity: 0%;
+}
 
 // --- Table of Contents modal ---
 

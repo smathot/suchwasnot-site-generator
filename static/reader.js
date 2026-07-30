@@ -13,6 +13,7 @@
     const prevBtn = document.getElementById("prev-page");
     const nextBtn = document.getElementById("next-page");
     const indicator = document.getElementById("page-indicator");
+    const pageTitleEl = document.getElementById("page-title");
     const tocBtn = document.getElementById("toc");
     const tocModal = document.getElementById("toc-modal");
     const tocClose = document.getElementById("toc-close");
@@ -207,6 +208,7 @@
             applyTransform();
             updateIndicator();
             updateButtons();
+            updatePageTitle();
 
             // --- Initial position restore (runs only once) --->
             if (!initialPositionHandled) {
@@ -247,6 +249,57 @@
         nextBtn.disabled = currentPage >= pageCount - 1;
     }
 
+    // --- Page title ---
+    //
+    // Shows the title of the story the user is currently reading in the
+    // #page-title span. The "current story" is the last H1 that appears
+    // on or before the current page. When the H1 itself is visible on the
+    // current page, the span is cleared to avoid showing the title twice.
+    // If no H1 precedes the current page, the span is also cleared.
+
+    function updatePageTitle() {
+        if (!pageTitleEl) return;
+
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var contentRect = content.getBoundingClientRect();
+        var headings = content.querySelectorAll("h1");
+        var titleText = "suchwasnot";
+        var titleHidden = true;
+
+        for (var i = 0; i < headings.length; i++) {
+            var h1Rect = headings[i].getBoundingClientRect();
+            var h1Left = h1Rect.left - contentRect.left;
+            var h1Page = Math.floor(h1Left / pageWidth);
+
+            if (h1Page < currentPage) {
+                // H1 is on a previous page — remember it as current story title
+                titleText = headings[i].textContent;
+                titleHidden = false;
+            } else if (h1Page === currentPage) {
+                // H1 is visible on the current page — clear to avoid duplication
+                titleText = headings[i].textContent;
+                titleHidden = true;
+                break;
+            } else {
+                // H1 is on a future page — no need to look further
+                break;
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+
+        pageTitleEl.textContent = titleText.toUpperCase();
+        if (titleHidden) {
+            pageTitleEl.classList.add("fully-transparent");
+        } else {
+            pageTitleEl.classList.remove("fully-transparent");
+        }
+    }
+
     function goToPage(n) {
         if (isAnimating) return;
         var target = Math.max(0, Math.min(n, pageCount - 1));
@@ -255,6 +308,7 @@
         isAnimating = true;
         currentPage = target;
         applyTransform();
+        updatePageTitle();
 
         setTimeout(function () {
             isAnimating = false;

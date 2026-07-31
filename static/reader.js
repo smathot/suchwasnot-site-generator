@@ -158,10 +158,24 @@
     // or fonts load differently, the fraction still points to roughly the
     // same spot in the text stream.
 
+    // currentFraction is updated whenever we reach a stable layout state
+    // (end of recalculate, or after goToPage). It is read by recalculate()
+    // to restore the reading position across reflows. We CANNOT recompute
+    // it from the DOM at the start of recalculate() because by then the
+    // browser has already reflowed with the old column-width but the new
+    // viewport size, making content.scrollWidth stale.
+    var currentFraction = 0;
+
+    function updateFraction() {
+        if (pageWidth > 0 && content.scrollWidth > 0) {
+            currentFraction = (currentPage * pageWidth) / content.scrollWidth;
+        }
+    }
+
     function savePosition() {
+        updateFraction();
         if (pageWidth === 0 || pageCount <= 1) return;
-        var fraction = (currentPage * pageWidth) / content.scrollWidth;
-        setCookie(COOKIE_NAME, fraction, COOKIE_DAYS);
+        setCookie(COOKIE_NAME, currentFraction, COOKIE_DAYS);
     }
 
     function restoreFromCookie() {
@@ -169,6 +183,17 @@
         if (raw === null) return null;
         var fraction = parseFloat(raw);
         if (isNaN(fraction) || fraction < 0 || fraction > 1) return null;
+        return fractionToPage(fraction);
+    }
+
+    // --- Fraction / page conversion ---
+    //
+    // Converts a fractional position (0.0–1.0 of total content width) to a
+    // page index, clamped to valid range. Uses the CURRENT content.scrollWidth
+    // and pageWidth (i.e. the post-reflow values) to map the old proportional
+    // position onto the new page layout.
+
+    function fractionToPage(fraction) {
         var pixelPos = fraction * content.scrollWidth;
         var page = Math.round(pixelPos / pageWidth);
         return Math.max(0, Math.min(page, pageCount - 1));
@@ -259,7 +284,16 @@
                 pageWidth = content.scrollWidth / pageCount;
             }
 
-            if (currentPage >= pageCount) {
+            // Restore the reading position. On the first call
+            // (!initialPositionHandled), we skip this and let the
+            // initialPositionHandled block below handle navigation (cookie
+            // or URL hash). On subsequent calls (resize, zoom, orientation
+            // change), we use currentFraction — which was captured during
+            // the last stable layout — to jump to the same proportional
+            // position in the newly reflowed content.
+            if (initialPositionHandled) {
+                currentPage = fractionToPage(currentFraction);
+            } else if (currentPage >= pageCount) {
                 currentPage = pageCount - 1;
             }
 

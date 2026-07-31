@@ -144,6 +144,19 @@ body {
             animation: target-flash 1s ease;
         }
     }
+    
+    h2 {
+        margin: 1em 0em;
+        break-after: avoid;
+
+        &::before {
+            content: "– ";
+        }
+
+        &::after {
+            content: " –";
+        }
+    }
 
     // Used in welcome section for title headings
     h3 {
@@ -265,6 +278,14 @@ body {
     }
     
     h1#contents:after {
+    	content: url("griffinfly.svg");
+    }
+    
+    h1#griffinfly:after {
+    	content: url("griffinfly.svg");
+    }
+    
+    h1#senescence:after {
     	content: url("griffinfly.svg");
     }
         

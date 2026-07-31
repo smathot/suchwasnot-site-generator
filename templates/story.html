@@ -5,7 +5,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="griffinfly.png" type="image/svg+xml">
-    <title>Such Was Not</title>
+
+    <title>{{ meta_title }}</title>
+
+    {# --- SEO meta tags --- #}
+    <meta name="description" content="{{ meta_description }}">
+    <meta name="author" content="{{ author }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {# --- Open Graph (Facebook, LinkedIn, etc.) --- #}
+    <meta property="og:type" content="book">
+    <meta property="og:title" content="{{ meta_title }}">
+    <meta property="og:description" content="{{ meta_description }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:image" content="{{ og_image }}">
+    <meta property="og:image:alt" content="Cover of {{ meta_title }}">
+    <meta property="og:site_name" content="{{ meta_title }}">
+    <meta property="book:author" content="{{ author }}">
+
+    {# --- Twitter / X Card --- #}
+    {# Still consumed by X (formerly Twitter) and other crawlers that
+       look for twitter: tags. Keeping these ensures rich previews on X. #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta_title }}">
+    <meta name="twitter:description" content="{{ meta_description }}">
+    <meta name="twitter:image" content="{{ og_image }}">
+
+    {# --- Structured data (JSON-LD) --- #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": "{{ meta_title }}",
+        "description": "{{ meta_description }}",
+        "author": {
+            "@type": "Person",
+            "name": "{{ author }}"
+        },
+        "image": "{{ og_image }}",
+        "url": "{{ canonical_url }}",
+        "inLanguage": "en",
+        "datePublished": "{{ publish_date }}",
+        "publisher": {
+            "@type": "Person",
+            "name": "{{ author }}"
+        }
+    }
+    </script>
+
     <style>
         {{ compiled_css | safe }}
     </style>
@@ -51,10 +98,10 @@
                     </ul>
                 </nav>
             </div>
-            
+
             <div class="toc-modal" id="copyright-modal" hidden>
                 <button class="toc-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
-                <p>© 2026 Sebastiaan Mathôt</p>
+                <p>© {{ copyright_year }} {{ author }}</p>
                 <p>All rights reserved. No part of this publication may be reproduced without written permission.</p>
             </div>            
         </div>

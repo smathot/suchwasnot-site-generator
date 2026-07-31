@@ -10,6 +10,7 @@ import argparse
 import re
 import shutil
 import uuid
+from datetime import date
 from pathlib import Path
 import yaml
 import markdown
@@ -19,6 +20,16 @@ from jinja2 import Environment, FileSystemLoader
 # --- Paths ---
 ROOT = Path(__file__).parent
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"}
+
+# --- Metadata keys expected at the top level of content.yaml ---
+METADATA_KEYS = [
+    "meta_title",
+    "meta_description",
+    "author",
+    "canonical_url",
+    "og_image",
+    "google_analytics_id",
+]
 
 
 def parse_args():
@@ -61,20 +72,29 @@ def parse_args():
         help="Target directory for rendered site"
              "(default: current working directory/output).",
     )
-    parser.add_argument(
-        "--google-analytics-id",
-        type=str,
-        help="Google Analytics ID"
-             "(default: None).",
-    )
     return parser.parse_args()
 
 
 def load_config(content_dir):
-    """Load the content configuration from content.yaml."""
+    """Load the content configuration from content.yaml.
+
+    Validates that all required metadata keys are present and that
+    a `content` section exists.
+    """
     content_yaml = content_dir / "content.yaml"
     with open(content_yaml) as f:
-        return yaml.safe_load(f)
+        config = yaml.safe_load(f)
+
+    missing = [k for k in METADATA_KEYS if k not in config]
+    if missing:
+        raise ValueError(
+            f"content.yaml is missing required metadata keys: {', '.join(missing)}"
+        )
+
+    if "content" not in config:
+        raise ValueError("content.yaml is missing the 'content' section.")
+
+    return config
 
 
 def extract_title(text, fallback):
@@ -171,7 +191,6 @@ def load_slideshow(content_dir, output_dir, slides_config, slug):
         )
 
     html = '<div class="slideshow">\n' + "\n".join(slide_parts) + "\n</div>"
-    print(html)
     return title, html
 
 
@@ -221,12 +240,17 @@ def cache_bust(html):
     return html
 
 
-def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google_analytics_id):
+def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     """Build the complete static site as a single reflowing document."""
     print("Building e-reader site...")
 
     resources_dir = content_dir / "resources"
     config = load_config(content_dir)
+    metadata = {k: config[k] for k in METADATA_KEYS}
+    today = date.today()
+    metadata["publish_date"] = today.isoformat()
+    metadata["copyright_year"] = today.year
+    content = config["content"]
     compiled_css = compile_scss(styles_dir)
     reader_js = load_js(static_dir)
 
@@ -241,7 +265,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google
 
     # Build all content sections
     sections = []
-    for slug, entry in config.items():
+    for slug, entry in content.items():
         if isinstance(entry, list):
             # Slideshow
             title, html = load_slideshow(content_dir, output_dir, entry, slug)
@@ -279,7 +303,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google
 
     # Build TOC entries from sections that have an explicit title in content.yaml
     toc_entries = []
-    for slug, entry in config.items():
+    for slug, entry in content.items():
         if isinstance(entry, dict) and "title" in entry:
             toc_entries.append({
                 "slug": slug,
@@ -292,7 +316,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google
         toc_entries=toc_entries,
         compiled_css=compiled_css,
         reader_js=reader_js,
-        google_analytics_id=google_analytics_id
+        **metadata,
     )
 
     # Cache-bust local resource URLs
@@ -311,4 +335,4 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google
 if __name__ == "__main__":
     args = parse_args()
     build(args.content_dir, args.templates_dir, args.styles_dir, args.static_dir,
-          args.output_dir, args.google_analytics_id)
+          args.output_dir)

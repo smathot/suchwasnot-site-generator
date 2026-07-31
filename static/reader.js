@@ -27,20 +27,20 @@
     let pageWidth = 0;
     let isAnimating = false;
     let initialPositionHandled = false;
-    
+
     // --- COPYRIGHT modal ---
     function openCopyright() {
         copyrightModal.hidden = false;
     }
-    
+
     function closeCopyright() {
         copyrightModal.hidden = true;
     }
-    
+
     function isCopyrightOpen() {
         return !copyrightModal.hidden;
     }
-    
+
     function toggleCopyright() {
         if (isCopyrightOpen()) {
             closeCopyright();
@@ -48,19 +48,19 @@
             openCopyright();
         }
     }
-    
+
     copyrightBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
         toggleCopyright();
     });
-    
+
     copyrightClose.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
         closeCopyright();
     });
-    
+
     // Close modal when Escape is pressed
     document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && isCopyrightOpen()) {
@@ -82,7 +82,7 @@
     function isTocOpen() {
         return !tocModal.hidden;
     }
-    
+
     function toggleToc() {
         if (isTocOpen()) {
             closeToc();
@@ -102,7 +102,7 @@
         e.stopPropagation();
         closeToc();
     });
-    
+
     // Close modal when Escape is pressed
     document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && isTocOpen()) {
@@ -221,6 +221,19 @@
         }, duration * 1000);
     }
 
+    // --- Page calculation helper ---
+    //
+    // Maps a pixel offset (relative to the content's left edge) to a page
+    // index. A 1px epsilon is added before the floor division to absorb
+    // sub-pixel rounding noise from getBoundingClientRect() at column
+    // boundaries. Without this, an element at the very start of page N
+    // might report an offset of N×pageWidth − 0.4, which floors to page
+    // N−1 — causing wrong-page navigation and title visibility bugs.
+
+    function pageOfOffset(offset) {
+        return Math.floor((offset + 1) / pageWidth);
+    }
+
     function recalculate() {
         // Measure the viewport width — this is our initial "page width"
         // estimate.
@@ -319,7 +332,7 @@
         for (var i = 0; i < headings.length; i++) {
             var h1Rect = headings[i].getBoundingClientRect();
             var h1Left = h1Rect.left - contentRect.left;
-            var h1Page = Math.floor(h1Left / pageWidth);
+            var h1Page = pageOfOffset(h1Left);
 
             if (h1Page < currentPage) {
                 // H1 is on a previous page — remember it as current story title
@@ -374,7 +387,7 @@
         for (var i = 0; i < headings.length; i++) {
             var h1Rect = headings[i].getBoundingClientRect();
             var h1Left = h1Rect.left - contentRect.left;
-            var h1Page = Math.floor(h1Left / pageWidth);
+            var h1Page = pageOfOffset(h1Left);
 
             if (h1Page <= currentPage) {
                 // This H1 is on or before the current page — it's our story start
@@ -438,7 +451,7 @@
         var elRect = el.getBoundingClientRect();
         var contentRect = content.getBoundingClientRect();
         var offset = elRect.left - contentRect.left;
-        var page = Math.floor(offset / pageWidth);
+        var page = pageOfOffset(offset);
 
         // Restore the transform
         applyTransform();

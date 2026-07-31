@@ -9,6 +9,14 @@
     <style>
         {{ compiled_css | safe }}
     </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ google_analytics_id }}');
+    </script>    
 </head>
 <body>
     <div id="reader" class="reader">
@@ -43,6 +51,12 @@
                     </ul>
                 </nav>
             </div>
+            
+            <div class="toc-modal" id="copyright-modal" hidden>
+                <button class="toc-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
+                <p>© 2026 Sebastiaan Mathôt</p>
+                <p>All rights reserved. No part of this publication may be reproduced without written permission.</p>
+            </div>            
         </div>
 
         <div class="reader__controls">
@@ -50,6 +64,7 @@
             <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#8249;</button>
             <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
             <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#8250;</button>
+            <button class="reader__nav reader__nav--contents" id="copyright" aria-label="Copyright">COPYRIGHT</button>
         </div>
     </div>
 

@@ -18,12 +18,56 @@
     const tocBtn = document.getElementById("toc");
     const tocModal = document.getElementById("toc-modal");
     const tocClose = document.getElementById("toc-close");
+    const copyrightBtn = document.getElementById("copyright");
+    const copyrightModal = document.getElementById("copyright-modal");
+    const copyrightClose = document.getElementById("copyright-close");
 
     let currentPage = 0;
     let pageCount = 1;
     let pageWidth = 0;
     let isAnimating = false;
     let initialPositionHandled = false;
+    
+    // --- COPYRIGHT modal ---
+    function openCopyright() {
+        copyrightModal.hidden = false;
+    }
+    
+    function closeCopyright() {
+        copyrightModal.hidden = true;
+    }
+    
+    function isCopyrightOpen() {
+        return !copyrightModal.hidden;
+    }
+    
+    function toggleCopyright() {
+        if (isCopyrightOpen()) {
+            closeCopyright();
+        } else {
+            openCopyright();
+        }
+    }
+    
+    copyrightBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleCopyright();
+    });
+    
+    copyrightClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeCopyright();
+    });
+    
+    // Close modal when Escape is pressed
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isCopyrightOpen()) {
+            e.preventDefault();
+            closeCopyright();
+        }
+    });
 
     // --- TOC modal ---
 
@@ -58,7 +102,7 @@
         e.stopPropagation();
         closeToc();
     });
-
+    
     // Close modal when Escape is pressed
     document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && isTocOpen()) {

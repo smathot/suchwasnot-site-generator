@@ -61,6 +61,12 @@ def parse_args():
         help="Target directory for rendered site"
              "(default: current working directory/output).",
     )
+    parser.add_argument(
+        "--google-analytics-id",
+        type=str,
+        help="Google Analytics ID"
+             "(default: None).",
+    )
     return parser.parse_args()
 
 
@@ -118,7 +124,7 @@ def load_story(content_dir, source):
     slug_title = md_path.stem.replace("-", " ").title()
     title = extract_title(text, slug_title)
     html = markdown.markdown(preprocess_md(text),
-                             extensions=["extra", "attr_list"])
+                             extensions=["extra", "attr_list", "smarty"])
     return title, html
 
 
@@ -215,7 +221,7 @@ def cache_bust(html):
     return html
 
 
-def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
+def build(content_dir, templates_dir, styles_dir, static_dir, output_dir, google_analytics_id):
     """Build the complete static site as a single reflowing document."""
     print("Building e-reader site...")
 
@@ -286,6 +292,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
         toc_entries=toc_entries,
         compiled_css=compiled_css,
         reader_js=reader_js,
+        google_analytics_id=google_analytics_id
     )
 
     # Cache-bust local resource URLs
@@ -304,4 +311,4 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
 if __name__ == "__main__":
     args = parse_args()
     build(args.content_dir, args.templates_dir, args.styles_dir, args.static_dir,
-          args.output_dir)
+          args.output_dir, args.google_analytics_id)

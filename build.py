@@ -109,6 +109,11 @@ def extract_title(text, fallback):
 def preprocess_md(md: str) -> str:
     # Ensure dialogue dashes are separated so they get their own paragraph.
     md = md.replace("\n— ", "\n\n—&thinsp;")
+    
+    # If the first letter is followed by a straight quote, we turn it into a curly
+    # closing quote. This is necessary, because the big-letter span will cause the 
+    # markdown smarty extension to treat it as an opening quote.
+    md = re.sub(r'([A-Za-z])\'', r'\1’', md, count=1)
 
     # Wrap the first letter after a newline in a <span class="big-letter"> tag.    
     md = re.sub(r'\n([A-Za-z])', r'\n<span class="big-letter">\1</span>',

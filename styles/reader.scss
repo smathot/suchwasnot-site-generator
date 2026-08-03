@@ -1,18 +1,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 
-// --- Variables ---
+// --- CSS custom properties (themed colours) ---
+//
+// All colours are defined as CSS custom properties so a single
+// @media (prefers-color-scheme: dark) block can override every
+// colour in the stylesheet. Derived values that would normally use
+// SCSS colour functions (lighten, rgba) are pre-computed and exposed
+// as their own variables, since CSS custom properties cannot be
+// passed through SCSS functions at runtime.
+
+:root {
+    --reader-body:           #fdf9ed;
+    --reader-border:         #93a1a1;
+    --reader-text:           #002b36;
+    --reader-text-muted:     #586e75;
+    --reader-accent:         #ce2714;
+    --reader-accent-light:   #ef6859;  // lighten(#ce2714, 20%)
+    --reader-text-light:     #006882;  // lighten(#002b36, 15%)
+    --reader-body-overlay:   rgba(253, 249, 237, 0.97);
+    --reader-accent-translucent: rgba(206, 39, 20, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --reader-body:           #1a1a17;
+        --reader-border:         #4a4a44;
+        --reader-text:           #e8e0d0;
+        --reader-text-muted:     #8a8a7a;
+        --reader-accent:         #e84030;
+        --reader-accent-light:   #f06050;
+        --reader-text-light:     #c0b8a8;
+        --reader-body-overlay:   rgba(26, 26, 23, 0.97);
+        --reader-accent-translucent: rgba(232, 64, 48, 0.2);
+    }
+}
+
+// --- Non-themed SCSS variables ---
 
 $reader-max-width: 42em;
 $reader-padding-x-wide: 0em;
 $reader-padding-y-wide: 2em;
 $reader-padding-x-narrow: 1em;
 $reader-padding-y-narrow: 2em;
-$reader-body: #fdf9ed;
-$reader-border: #93a1a1;
-$reader-text: #002b36;
-$reader-text-muted: #586e75;
-$reader-accent: #ce2714;
 $reader-font: "EB Garamond", Georgia, "Times New Roman", serif;
 $header-font: "Jost", Arial, sans;
 $footer-font: $header-font;
@@ -32,9 +62,9 @@ html, body {
 }
 
 body {
-    background-color: $reader-body;
+    background-color: var(--reader-body);
     font-family: $reader-font;
-    color: $reader-text;
+    color: var(--reader-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     // Disable text selection globally for a native app feel
@@ -127,7 +157,7 @@ body {
     }
 
     h1, h2, h3 {
-        color: $reader-accent;
+        color: var(--reader-accent);
         font-family: $header-font;
         text-transform: uppercase;
         font-weight: normal;
@@ -170,7 +200,7 @@ body {
         text-align: center;
         font-size: .9em;
         font-family: $header-font;
-        color: $reader-text-muted;
+        color: var(--reader-text-muted);
     }
 
     p {
@@ -189,7 +219,7 @@ body {
     a {
         text-decoration: none;
         font-weight: bold;
-        color: $reader-text;
+        color: var(--reader-text);
     }
     
     a:hover {
@@ -197,7 +227,7 @@ body {
     }
     
     a:visited {
-        color: $reader-text;
+        color: var(--reader-text);
     }
     
     code {
@@ -227,12 +257,12 @@ body {
         line-height: 1;
         margin-right: 0.1em;
         margin-bottom: -.2em;
-        color: $reader-accent;
+        color: var(--reader-accent);
     }
     
     .right-note {
         font-family: $header-font;
-        color: $reader-text-muted;
+        color: var(--reader-text-muted);
         font-size: .8em;
         bar-align: right;
         margin-top: 0em!important;
@@ -249,15 +279,15 @@ body {
         
         &::before {
             content: "𖧹";
-            color: $reader-text-muted;
+            color: var(--reader-text-muted);
         }
     }
 
     blockquote {
         margin: 1.5em 0;
-        border-left: 3px solid lighten($reader-accent, 20%);
+        border-left: 3px solid var(--reader-accent-light);
         font-style: italic;
-        color: lighten($reader-text, 15%);
+        color: var(--reader-text-light);
     }
 
     img {
@@ -278,23 +308,27 @@ body {
     }
     
     h1#contents:after {
-    	content: url("griffinfly.svg");
+    	    content: url("griffinfly.svg");
     }
     
     h1#griffinfly:after {
-    	content: url("griffinfly.svg");
+    	    content: url("griffinfly.svg");
     }
     
     h1#senescence:after {
-    	content: url("griffinfly.svg");
+    	    content: url("griffinfly.svg");
     }
         
     h1#the-cephalopod:after {
-    	content: url("the-cephalopod.svg");
+    	    content: url("the-cephalopod.svg");
+    }
+    
+    h1#the-holographic-principle:after {
+    	    content: url("the-holographic-principle.svg");
     }
     
     h1#such-was-not-the-way-things-were:after {
-    	content: url("such-was-not-the-way-things-were.svg");
+    	    content: url("such-was-not-the-way-things-were.svg");
     }
 }
 
@@ -316,7 +350,7 @@ body {
         width: auto;
         height: auto;
         object-fit: contain;
-        border: solid 1px $reader-border;
+        border: solid 1px var(--reader-border);
     }
 }
 
@@ -349,7 +383,7 @@ body {
 // --- Target flash animation --
 
 @keyframes target-flash {
-    0% { background: rgba($reader-accent, 0.2); }
+    0% { background: var(--reader-accent-translucent); }
     100% { background: transparent; }
 }
 
@@ -366,10 +400,10 @@ body {
     background: transparent;
     user-select: none;
     font-family: $footer-font;
-    color: $reader-text-muted;
+    color: var(--reader-text-muted);
     font-size: .8rem;
     button {
-        color: $reader-text-muted;
+        color: var(--reader-text-muted);
         font-size: .8rem;
         border: none;
         background: none;
@@ -383,7 +417,7 @@ body {
 // --- Top controls bar (page title, share, follow) ---
 
 .reader-btn {
-    color: $reader-text-muted;
+    color: var(--reader-text-muted);
     font-family: $footer-font;
     font-size: .8rem;
     border: none;
@@ -393,7 +427,7 @@ body {
     transition: color 0.2s ease;
 
     &:hover {
-        color: $reader-accent;
+        color: var(--reader-accent);
     }
 }
 
@@ -413,7 +447,7 @@ body {
     left: 0;
     height: 100%;
     width: 0%;
-    background: $reader-text-muted;
+    background: var(--reader-text-muted);
     transition: width 0.3s ease;
 }
 
@@ -423,7 +457,7 @@ body {
     position: absolute;
     inset: 0;
     z-index: 10;
-    background: rgba($reader-body, 0.97);
+    background: var(--reader-body-overlay);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -444,18 +478,18 @@ body {
     background: none;
     button: none;
     font-size: 1.5rem;
-    color: $reader-text-muted;
+    color: var(--reader-text-muted);
     cursor: pointer;
     padding: 0.5em;
     line-height: 1;
     transition: color 0.2s ease;
 
     &:hover {
-        color: $reader-accent;
+        color: var(--reader-accent);
     }
 
     &:focus {
-        outline: 2px solid $reader-accent;
+        outline: 2px solid var(--reader-accent);
         outline-offset: 2px;
     }
 }
@@ -468,7 +502,7 @@ body {
 .dialog-modal__title {
     font-family: $header-font;
     font-size: 1.25rem;
-    color: $reader-accent;
+    color: var(--reader-accent);
     text-transform: uppercase;
     text-align: center;
     margin-bottom: 2em;
@@ -492,18 +526,18 @@ body {
 
 .dialog-modal__link {
     font-family: $header-font;
-    color: $reader-text;
+    color: var(--reader-text);
     text-decoration: none;
     font-weight: normal;
     transition: color 0.2s ease;
     
     &:hover {
-        color: $reader-accent;
+        color: var(--reader-accent);
         text-decoration: underline;
     }
 
     &:focus {
-        outline: 2px solid $reader-accent;
+        outline: 2px solid var(--reader-accent);
         outline-offset: 4px;
     }
 }
@@ -521,5 +555,5 @@ body {
 }
 
 .copy-link-btn--copied {
-    color: $reader-accent;
+    color: var(--reader-accent);
 }

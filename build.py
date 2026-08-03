@@ -22,6 +22,13 @@ from jinja2 import Environment, FileSystemLoader
 ROOT = Path(__file__).parent
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"}
 
+# --- SVG theme colors ---
+# These match the --reader-text values in reader.scss.
+# Injected into SVG files at build time so decorations
+# adapt to light/dark mode automatically.
+SVG_LIGHT_FILL = "#002b36"
+SVG_DARK_FILL = "#e8e0d0"
+
 # --- Metadata keys expected at the top level of content.yaml ---
 METADATA_KEYS = [
     "meta_title",
@@ -236,6 +243,44 @@ def load_slideshow(content_dir, output_dir, slides_config, slug):
     return title, html
 
 
+def patch_svg_fill(svg_text, fill_color):
+    """Replace all black fill colors in an SVG with the given color.
+
+    Handles both CSS-style fill (#000000 in style attributes) and
+    XML-style fill (fill="#000000" as standalone attributes).
+    """
+    # Replace fill:#000000 (in style attributes)
+    patched = svg_text.replace("fill:#000000", f"fill:{fill_color}")
+    # Replace fill="#000000" (as standalone attribute, if any)
+    patched = patched.replace('fill="#000000"', f'fill="{fill_color}"')
+    return patched
+
+
+def copy_resources(resources_dir, output_dir):
+    """Copy resource files to the output directory.
+
+    SVG files are written twice: once with the light-mode fill color
+    (e.g. ``foo.svg``) and once with the dark-mode fill color
+    (e.g. ``foo-dark.svg``). All other files are copied as-is.
+    """
+    for src in resources_dir.iterdir():
+        if src.is_dir():
+            continue
+        if src.suffix.lower() == ".svg":
+            with open(src) as f:
+                svg_text = f.read()
+            # Light variant: foo.svg
+            with open(output_dir / src.name, "w") as f:
+                f.write(patch_svg_fill(svg_text, SVG_LIGHT_FILL))
+            # Dark variant: foo-dark.svg
+            stem = src.stem
+            dark_name = f"{stem}-dark{src.suffix}"
+            with open(output_dir / dark_name, "w") as f:
+                f.write(patch_svg_fill(svg_text, SVG_DARK_FILL))
+        else:
+            shutil.copy2(src, output_dir / src.name)
+
+
 def compile_scss(styles_dir):
     """Compile reader.scss to CSS."""
     scss_path = styles_dir / "reader.scss"
@@ -411,7 +456,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
         f.write(html)
 
     # Copy images to output
-    shutil.copytree(resources_dir, output_dir, dirs_exist_ok=True)
+    copy_resources(resources_dir, output_dir)
 
     print(f"\nDone! {len(sections)} section(s) built to {output_path.relative_to(ROOT)}")
 

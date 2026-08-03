@@ -264,7 +264,7 @@ body {
         font-family: $header-font;
         color: var(--reader-text-muted);
         font-size: .8em;
-        bar-align: right;
+        text-align: right;
         margin-top: 0em!important;
     }
     
@@ -294,6 +294,14 @@ body {
         max-width: 100%;
         height: auto;
         break-inside: avoid;
+    }
+    
+    .quote p {
+        	text-indent: 0em;
+    }
+    
+    .quote {
+        	margin: 0em 2em 2em 2em;	
     }
 
     // Prevent awkward breaks for short elements
@@ -329,6 +337,27 @@ body {
     
     h1#such-was-not-the-way-things-were:after {
     	    content: url("such-was-not-the-way-things-were.svg");
+    }
+
+    // Dark mode: use dark-variant SVGs for heading decorations
+    @media (prefers-color-scheme: dark) {
+        h1#contents:after,
+        h1#griffinfly:after,
+        h1#senescence:after {
+            content: url("griffinfly-dark.svg");
+        }
+
+        h1#the-cephalopod:after {
+            content: url("the-cephalopod-dark.svg");
+        }
+
+        h1#the-holographic-principle:after {
+            content: url("the-holographic-principle-dark.svg");
+        }
+
+        h1#such-was-not-the-way-things-were:after {
+            content: url("such-was-not-the-way-things-were-dark.svg");
+        }
     }
 }
 
@@ -407,6 +436,14 @@ body {
         font-size: .8rem;
         border: none;
         background: none;
+    }    
+    
+    .reader__nav--prev,
+    .reader__nav--next {
+        cursor: pointer;
+        &:hover {
+            color: var(--reader-accent);
+        }
     }    
 }
 

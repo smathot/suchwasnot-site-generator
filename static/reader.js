@@ -7,6 +7,12 @@
 
 (function () {
     "use strict";
+    
+    let currentPage = 0;
+    let pageCount = 1;
+    let pageWidth = 0;
+    let isAnimating = false;
+    let initialPositionHandled = false;    
 
     const viewport = document.querySelector(".reader__viewport");
     const content = document.getElementById("reader-content");
@@ -15,100 +21,96 @@
     const indicator = document.getElementById("page-indicator");
     const pageTitleEl = document.getElementById("page-title");
     const storyProgressFill = document.getElementById("story-progress-fill");
+
+    // --- Modal references ---
     const tocBtn = document.getElementById("toc");
     const tocModal = document.getElementById("toc-modal");
     const tocClose = document.getElementById("toc-close");
     const copyrightBtn = document.getElementById("copyright");
     const copyrightModal = document.getElementById("copyright-modal");
     const copyrightClose = document.getElementById("copyright-close");
+    const shareBtn = document.getElementById("share-btn");
+    const shareModal = document.getElementById("share-modal");
+    const shareClose = document.getElementById("share-close");
+    const followBtn = document.getElementById("follow-btn");
+    const followModal = document.getElementById("follow-modal");
+    const followClose = document.getElementById("follow-close");
+    const copyLinkBtn = document.getElementById("copy-link-btn");
 
-    let currentPage = 0;
-    let pageCount = 1;
-    let pageWidth = 0;
-    let isAnimating = false;
-    let initialPositionHandled = false;
+    // --- All modals list (for checking if any modal is open) ---
+    var allModals = [tocModal, copyrightModal, shareModal, followModal];
 
-    // --- COPYRIGHT modal ---
-    function openCopyright() {
-        copyrightModal.hidden = false;
+    function isAnyModalOpen() {
+        for (var i = 0; i < allModals.length; i++) {
+            if (!allModals[i].hidden) return true;
+        }
+        return false;
     }
 
-    function closeCopyright() {
-        copyrightModal.hidden = true;
+    // --- Generic modal helpers ---
+
+    function openModal(modal) {
+        modal.hidden = false;
     }
 
-    function isCopyrightOpen() {
-        return !copyrightModal.hidden;
+    function closeModal(modal) {
+        modal.hidden = true;
     }
 
-    function toggleCopyright() {
-        if (isCopyrightOpen()) {
-            closeCopyright();
+    function isModalOpen(modal) {
+        return !modal.hidden;
+    }
+
+    function toggleModal(modal) {
+        if (isModalOpen(modal)) {
+            closeModal(modal);
         } else {
-            openCopyright();
+            openModal(modal);
         }
     }
+
+    // Close all modals (used before opening a new one if desired)
+    function closeAllModals() {
+        for (var i = 0; i < allModals.length; i++) {
+            closeModal(allModals[i]);
+        }
+    }
+
+    // --- COPYRIGHT modal ---
 
     copyrightBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        toggleCopyright();
+        closeModal(tocModal);
+        closeModal(shareModal);
+        closeModal(followModal);
+        toggleModal(copyrightModal);
     });
 
     copyrightClose.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        closeCopyright();
-    });
-
-    // Close modal when Escape is pressed
-    document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && isCopyrightOpen()) {
-            e.preventDefault();
-            closeCopyright();
-        }
+        closeModal(copyrightModal);
     });
 
     // --- TOC modal ---
-
-    function openToc() {
-        tocModal.hidden = false;
-    }
-
-    function closeToc() {
-        tocModal.hidden = true;
-    }
-
-    function isTocOpen() {
-        return !tocModal.hidden;
-    }
-
-    function toggleToc() {
-        if (isTocOpen()) {
-            closeToc();
-        } else {
-            openToc();
-        }
-    }
+    pageTitleEl.addEventListener("click", function (e) {
+        tocBtn.click();
+    });
 
     tocBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        toggleToc();
+        closeModal(copyrightModal);
+        closeModal(shareModal);
+        closeModal(followModal);
+        toggleModal(tocModal);
     });
 
     tocClose.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        closeToc();
-    });
-
-    // Close modal when Escape is pressed
-    document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && isTocOpen()) {
-            e.preventDefault();
-            closeToc();
-        }
+        closeModal(tocModal);
     });
 
     // Handle TOC link clicks: navigate to the section and close the modal
@@ -120,8 +122,116 @@
         if (!hash || hash === "#") return;
 
         e.preventDefault();
-        closeToc();
+        closeModal(tocModal);
         goToAnchor(hash);
+    });
+
+    // --- SHARE modal ---
+
+    function openShareDialog() {
+        closeModal(tocModal);
+        closeModal(copyrightModal);
+        closeModal(followModal);
+        openModal(shareModal);
+    }
+
+    shareBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // If navigator.share is available, use the native share sheet.
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: window.location.href,
+            }).catch(function () {
+                // User cancelled or share failed — do nothing
+            });
+        } else {
+            // Fall back to our custom share dialog
+            openShareDialog();
+        }
+    });
+
+    shareClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(shareModal);
+    });
+
+    // --- Copy Link ---
+
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var url = window.location.href;
+            var originalText = copyLinkBtn.textContent;
+
+            // Try the modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () {
+                    copyLinkBtn.textContent = "Link Copied!";
+                    copyLinkBtn.classList.add("copy-link-btn--copied");
+                    setTimeout(function () {
+                        copyLinkBtn.textContent = originalText;
+                        copyLinkBtn.classList.remove("copy-link-btn--copied");
+                    }, 2000);
+                }).catch(function () {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+
+            function fallbackCopy(text) {
+                var textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand("copy");
+                    copyLinkBtn.textContent = "Link Copied!";
+                    copyLinkBtn.classList.add("copy-link-btn--copied");
+                    setTimeout(function () {
+                        copyLinkBtn.textContent = originalText;
+                        copyLinkBtn.classList.remove("copy-link-btn--copied");
+                    }, 2000);
+                } catch (err) {
+                    // Copy failed — leave button as is
+                }
+                document.body.removeChild(textarea);
+            }
+        });
+    }
+
+    // --- FOLLOW modal ---
+
+    followBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(shareModal);
+        closeModal(copyrightModal);
+        closeModal(tocModal);
+        toggleModal(followModal);
+    });
+
+    followClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(followModal);
+    });
+
+    // --- Close any modal on Escape ---
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isAnyModalOpen()) {
+            e.preventDefault();
+            closeAllModals();
+        }
     });
 
     // --- Cookie helpers ---
@@ -303,7 +413,7 @@
             updatePageTitle();
             updateStoryProgress();
 
-            // --- Initial position restore (runs only once) --->
+            // --- Initial position restore (runs only once) ---
             if (!initialPositionHandled) {
                 initialPositionHandled = true;
 
@@ -514,9 +624,9 @@
 
     // --- Keyboard navigation ---
     document.addEventListener("keydown", function (e) {
-        // Skip keyboard navigation when TOC modal is open (except Escape,
+        // Skip keyboard navigation when any modal is open (except Escape,
         // which is handled by its own listener above).
-        if (isTocOpen()) return;
+        if (isAnyModalOpen()) return;
 
         if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
             e.preventDefault();
@@ -571,8 +681,8 @@
         if (dragOccurred) return;
         // Don't advance when clicking links (handled by anchor interception)
         if (e.target.closest("a")) return;
-        // Don't advance when the TOC modal is open
-        if (isTocOpen()) return;
+        // Don't advance when any modal is open
+        if (isAnyModalOpen()) return;
         nextPage();
     });
 
@@ -582,7 +692,7 @@
     var touchActive = false;
 
     viewport.addEventListener("touchstart", function (e) {
-        if (isTocOpen()) return;
+        if (isAnyModalOpen()) return;
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchActive = true;
@@ -613,7 +723,7 @@
     var mouseActive = false;
 
     viewport.addEventListener("mousedown", function (e) {
-        if (isTocOpen()) return;
+        if (isAnyModalOpen()) return;
         if (e.target.closest(".reader__controls")) return;
         mouseStartX = e.clientX;
         mouseActive = true;
@@ -638,7 +748,7 @@
     // --- Mouse wheel navigation ---
     var wheelTimeout = null;
     viewport.addEventListener("wheel", function (e) {
-        if (isTocOpen()) return;
+        if (isAnyModalOpen()) return;
         e.preventDefault();
         if (isAnimating || wheelTimeout) return;
 

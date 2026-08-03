@@ -71,7 +71,9 @@
             <div class="story-progress__fill" id="story-progress-fill"></div>
         </div>
         <div class="reader__controls reader__controls--top">
-            <span class="reader__page-title" id="page-title">SUCHWASNOT</span>
+            <button class="reader-btn" id="share-btn" aria-label="Share this story">SHARE</button>
+            <button class="reader__page-title reader-btn" id="page-title">SUCHWASNOT</button>
+            <button class="reader-btn" id="follow-btn" aria-label="Follow on social media">FOLLOW</button>
         </div>
 
         <div class="reader__viewport">            
@@ -85,33 +87,69 @@
             </div>
 
             {# Table of Contents modal — covers the reader viewport #}
-            <div class="toc-modal" id="toc-modal" hidden>
-                <button class="toc-modal__close" id="toc-close" aria-label="Close table of contents">&#10005;</button>
-                <nav class="toc-modal__nav">
-                    <h2 class="toc-modal__title">Contents</h2>
-                    <ul class="toc-modal__list">
+            <div class="dialog-modal" id="toc-modal" hidden>
+                <button class="dialog-modal__close" id="toc-close" aria-label="Close table of contents">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Contents</h2>
+                    <ul class="dialog-modal__list">
                         {% for entry in toc_entries %}
-                        <li class="toc-modal__item">
-                            <a href="#{{ entry.slug }}" class="toc-modal__link">{{ entry.title }}</a>
+                        <li class="dialog-modal__item">
+                            <a href="#{{ entry.slug }}" class="dialog-modal__link">{{ entry.title }}</a>
                         </li>
                         {% endfor %}
                     </ul>
                 </nav>
             </div>
 
-            <div class="toc-modal" id="copyright-modal" hidden>
-                <button class="toc-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
+            {# Copyright modal #}
+            <div class="dialog-modal" id="copyright-modal" hidden>
+                <button class="dialog-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
                 <p>© {{ copyright_year }} {{ author }}</p>
                 <p>All rights reserved. No part of this publication may be reproduced without written permission.</p>
+            </div>
+
+            {# Share modal #}
+            <div class="dialog-modal" id="share-modal" hidden>
+                <button class="dialog-modal__close" id="share-close" aria-label="Close share dialog">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Share</h2>
+                    <ul class="dialog-modal__list">
+                        {% for item in share_links %}
+                        <li class="dialog-modal__item">
+                            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">{{ item.label }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="dialog-modal__item">
+                            <button class="copy-link-btn" id="copy-link-btn" aria-label="Copy link to clipboard">Copy Link</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            {# Follow modal #}
+            <div class="dialog-modal" id="follow-modal" hidden>
+                <button class="dialog-modal__close" id="follow-close" aria-label="Close follow dialog">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Follow</h2>
+                    <ul class="dialog-modal__list">
+                        {% for item in follow_links %}
+                        <li class="dialog-modal__item">
+                            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">{{ item.label }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
             </div>            
         </div>
 
-        <div class="reader__controls">
-            <button class="reader__nav reader__nav--contents" id="toc" aria-label="Contents">CONTENTS</button>
-            <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#8249;</button>
-            <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
-            <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#8250;</button>
-            <button class="reader__nav reader__nav--contents" id="copyright" aria-label="Copyright">COPYRIGHT</button>
+        <div class="reader__controls reader__controls--bottom">
+            <button class="reader__nav reader__nav--contents reader-btn" id="toc" aria-label="Contents">CONTENTS</button>
+            <div id="reader__nav--page-controls">
+                <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#8249;</button>
+                <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
+                <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#8250;</button>
+            </div>
+            <button class="reader__nav reader__nav--contents reader-btn" id="copyright" aria-label="Copyright">COPYRIGHT</button>
         </div>
     </div>
 

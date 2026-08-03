@@ -234,7 +234,7 @@ body {
         font-family: $header-font;
         color: $reader-text-muted;
         font-size: .8em;
-        text-align: right;
+        bar-align: right;
         margin-top: 0em!important;
     }
     
@@ -346,7 +346,7 @@ body {
     }
 }
 
-// --- Target flash animation ---
+// --- Target flash animation --
 
 @keyframes target-flash {
     0% { background: rgba($reader-accent, 0.2); }
@@ -360,7 +360,7 @@ body {
     max-width: $reader-max-width;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 1.5em;
     padding: 0.75em 1em;
     background: transparent;
@@ -378,6 +378,23 @@ body {
 
 .fully-transparent {
     opacity: 0%;
+}
+
+// --- Top controls bar (page title, share, follow) ---
+
+.reader-btn {
+    color: $reader-text-muted;
+    font-family: $footer-font;
+    font-size: .8rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0.5em 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: $reader-accent;
+    }
 }
 
 // --- Story progress bar ---
@@ -400,9 +417,9 @@ body {
     transition: width 0.3s ease;
 }
 
-// --- Table of Contents modal ---
+// --- Dialog modal (shared by TOC, copyright, share, follow) ---
 
-.toc-modal {
+.dialog-modal {
     position: absolute;
     inset: 0;
     z-index: 10;
@@ -419,12 +436,13 @@ body {
     }
 }
 
-.toc-modal__close {
+.dialog-modal__close {
+    border: none;
     position: absolute;
     top: 1em;
     right: 1em;
     background: none;
-    border: none;
+    button: none;
     font-size: 1.5rem;
     color: $reader-text-muted;
     cursor: pointer;
@@ -442,12 +460,12 @@ body {
     }
 }
 
-.toc-modal__nav {
+.dialog-modal__nav {
     max-width: 24em;
     width: 100%;
 }
 
-.toc-modal__title {
+.dialog-modal__title {
     font-family: $header-font;
     font-size: 1.25rem;
     color: $reader-accent;
@@ -457,13 +475,13 @@ body {
     font-weight: normal;
 }
 
-.toc-modal__list {
+.dialog-modal__list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.toc-modal__item {
+.dialog-modal__item {
     text-align: center;
     margin-bottom: 1em;
 
@@ -472,7 +490,7 @@ body {
     }
 }
 
-.toc-modal__link {
+.dialog-modal__link {
     font-family: $header-font;
     color: $reader-text;
     text-decoration: none;
@@ -488,4 +506,20 @@ body {
         outline: 2px solid $reader-accent;
         outline-offset: 4px;
     }
+}
+
+// --- Copy-link feedback ---
+
+.copy-link-btn {
+    @extend .dialog-modal__link;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline;
+    padding: 0;
+}
+
+.copy-link-btn--copied {
+    color: $reader-accent;
 }

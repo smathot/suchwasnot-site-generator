@@ -12,6 +12,7 @@ import shutil
 import uuid
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 import yaml
 import markdown
 import sass
@@ -29,6 +30,36 @@ METADATA_KEYS = [
     "canonical_url",
     "og_image",
     "google_analytics_id",
+    "share_text",
+    "share_title"
+]
+
+# --- Follow / share platform definitions ---
+# Each tuple is (config_key, display_label).  Only platforms whose URL
+# is present in content.yaml's `follow:` section will appear.
+FOLLOW_PLATFORMS = [
+    ("bluesky", "Bluesky"),
+    ("mastodon", "Mastodon"),
+    ("x", "X"),
+    ("facebook", "Facebook"),
+    ("instagram", "Instagram"),
+    ("linkedin", "LinkedIn"),
+    ("tumblr", "Tumblr"),
+    ("reddit", "Reddit"),
+    ("goodreads", "Goodreads"),
+    ("rss", "RSS"),
+]
+
+# Share platforms.  Each entry produces a share URL.
+SHARE_PLATFORMS = [
+    ("Bluesky", "https://bsky.app/intent/compose?text={text}"),
+    ("Mastodon", "https://mastodonshare.com/?text={text}&url={url}"),
+    ("X", "https://twitter.com/intent/tweet?text={text}&url={url}"),
+    ("Facebook", "https://www.facebook.com/sharer/sharer.php?u={url}"),
+    ("Reddit", "https://www.reddit.com/submit?url={url}&title={title}"),
+    ("Tumblr", "https://www.tumblr.com/widgets/share/tool?canonicalUrl={url}&title={title}"),
+    ("LinkedIn", "https://www.linkedin.com/sharing/share-offsite/?url={url}"),
+    ("Email", "mailto:?subject={title}&body={text}%0A%0A{url}"),
 ]
 
 
@@ -103,21 +134,25 @@ def extract_title(text, fallback):
         line = line.strip()
         if line.startswith("# "):
             return line[2:].strip()
-    return fallback    
+    return fallback
 
 
 def preprocess_md(md: str) -> str:
     # Ensure dialogue dashes are separated so they get their own paragraph.
-    md = md.replace("\n— ", "\n\n—&thinsp;")
-    
-    # If the first letter is followed by a straight quote, we turn it into a curly
-    # closing quote. This is necessary, because the big-letter span will cause the 
-    # markdown smarty extension to treat it as an opening quote.
-    md = re.sub(r'([A-Za-z])\'', r'\1’', md, count=1)
+    md = md.replace("\n\u2014 ", "\n\n\u2014&thinsp;")
 
-    # Wrap the first letter after a newline in a <span class="big-letter"> tag.    
-    md = re.sub(r'\n([A-Za-z])', r'\n<span class="big-letter">\1</span>',
-                md, count=1)
+    # If the first letter is followed by a straight quote, we turn it into a curly
+    # closing quote. This is necessary, because the big-letter span will cause the
+    # markdown smarty extension to treat it as an opening quote.
+    md = re.sub(r"([A-Za-z])'", r"\1&rsquo;", md, count=1)
+
+    # Wrap the first letter after a newline in a <span class="big-letter"> tag.
+    md = re.sub(
+        r"\n([A-Za-z])",
+        r'\n<span class="big-letter">\1</span>',
+        md,
+        count=1,
+    )
 
     def process_block(match):
         block = match.group(1)
@@ -130,11 +165,11 @@ def preprocess_md(md: str) -> str:
         while lines and not lines[-1].strip():
             lines.pop()
         # Rejoin with newlines
-        return '\n'.join(['```'] + lines + ['```'])
+        return "\n".join(["```"] + lines + ["```"])
 
     # Regex to match fenced code blocks (```content```)
-    pattern = re.compile(r'```(.*?)```', re.DOTALL)
-    return pattern.sub(process_block, md)    
+    pattern = re.compile(r"```(.*?)```", re.DOTALL)
+    return pattern.sub(process_block, md)
 
 
 def load_story(content_dir, source):
@@ -148,8 +183,10 @@ def load_story(content_dir, source):
 
     slug_title = md_path.stem.replace("-", " ").title()
     title = extract_title(text, slug_title)
-    html = markdown.markdown(preprocess_md(text),
-                             extensions=["extra", "attr_list", "smarty"])
+    html = markdown.markdown(
+        preprocess_md(text),
+        extensions=["extra", "attr_list", "smarty"],
+    )
     return title, html
 
 
@@ -245,6 +282,40 @@ def cache_bust(html):
     return html
 
 
+def build_share_links(canonical_url, share_title, share_text):
+    """Build a list of share-link dicts for the share dialog.
+
+    Each dict has keys 'label' and 'url'. Uses URL encoding.
+    """
+    enc_url = quote(canonical_url, safe="")
+    enc_title = quote(share_title, safe="")
+    enc_text = quote(share_text, safe="")
+
+    links = []
+    for label, template in SHARE_PLATFORMS:
+        url = template.format(
+            url=enc_url,
+            title=enc_title,
+            text=enc_text,
+        )
+        links.append({"label": label, "url": url})
+    return links
+
+
+def build_follow_links(config):
+    """Build a list of follow-link dicts from the 'follow' section of content.yaml.
+
+    Only platforms with a non-empty URL appear in the list.
+    """
+    follow_cfg = config.get("follow", {})
+    links = []
+    for key, label in FOLLOW_PLATFORMS:
+        url = follow_cfg.get(key)
+        if url:
+            links.append({"label": label, "url": url})
+    return links
+
+
 def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     """Build the complete static site as a single reflowing document."""
     print("Building e-reader site...")
@@ -258,6 +329,12 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     content = config["content"]
     compiled_css = compile_scss(styles_dir)
     reader_js = load_js(static_dir)
+
+    # Build share and follow link lists
+    share_links = build_share_links(
+        metadata["canonical_url"], metadata["share_title"], metadata["share_text"]
+    )
+    follow_links = build_follow_links(config)
 
     # Set up Jinja2
     env = Environment(loader=FileSystemLoader(str(templates_dir)), autoescape=True)
@@ -321,6 +398,8 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
         toc_entries=toc_entries,
         compiled_css=compiled_css,
         reader_js=reader_js,
+        share_links=share_links,
+        follow_links=follow_links,
         **metadata,
     )
 

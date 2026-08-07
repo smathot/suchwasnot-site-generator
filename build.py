@@ -38,7 +38,8 @@ METADATA_KEYS = [
     "og_image",
     "google_analytics_id",
     "share_text",
-    "share_title"
+    "share_title",
+    "copyright"
 ]
 
 # --- Follow / share platform definitions ---

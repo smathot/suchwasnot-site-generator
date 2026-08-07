@@ -178,6 +178,7 @@ body {
     h2 {
         margin: 1em 0em;
         break-after: avoid;
+        font-size: 1.25rem;
 
         &::before {
             content: "– ";
@@ -322,11 +323,7 @@ body {
     h1#griffinfly:after {
     	    content: url("griffinfly.svg");
     }
-    
-    h1#senescence:after {
-    	    content: url("griffinfly.svg");
-    }
-        
+            
     h1#the-cephalopod:after {
     	    content: url("the-cephalopod.svg");
     }
@@ -338,12 +335,20 @@ body {
     h1#such-was-not-the-way-things-were:after {
     	    content: url("such-was-not-the-way-things-were.svg");
     }
+    
+    h1#top-quant:after {
+    	    content: url("top-quant.svg");
+    }
+
+    
+    h1#senescence:after {
+    	    content: url("senescence.svg");
+    }
 
     // Dark mode: use dark-variant SVGs for heading decorations
     @media (prefers-color-scheme: dark) {
         h1#contents:after,
-        h1#griffinfly:after,
-        h1#senescence:after {
+        h1#griffinfly:after {
             content: url("griffinfly-dark.svg");
         }
 
@@ -358,6 +363,15 @@ body {
         h1#such-was-not-the-way-things-were:after {
             content: url("such-was-not-the-way-things-were-dark.svg");
         }
+        
+        h1#top-quant:after {
+            content: url("top-quant-dark.svg");
+        }
+        
+        h1#senescence:after {
+            content: url("senescence-dark.svg");
+        }
+
     }
 }
 
@@ -504,6 +518,13 @@ body {
 
     &[hidden] {
         display: none;
+    }
+    
+    p {
+        text-align: center;
+        a {
+            color: var(--reader-accent);
+        }    
     }
 }
 

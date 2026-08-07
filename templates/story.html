@@ -104,8 +104,8 @@
             {# Copyright modal #}
             <div class="dialog-modal" id="copyright-modal" hidden>
                 <button class="dialog-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
-                <p>© {{ copyright_year }} {{ author }}</p>
-                <p>All rights reserved. No part of this publication may be reproduced without written permission.</p>
+                <h2 class="dialog-modal__title">Copyright</h2>
+                {{ copyright|safe }}
             </div>
 
             {# Share modal #}
@@ -145,9 +145,9 @@
         <div class="reader__controls reader__controls--bottom">
             <button class="reader__nav reader__nav--contents reader-btn" id="toc" aria-label="Contents">CONTENTS</button>
             <div id="reader__nav--page-controls">
-                <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#x2B9C;</button>
+                <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#9664;</button>
                 <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
-                <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#x2B9E;</button>
+                <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#9654;</button>
             </div>
             <button class="reader__nav reader__nav--contents reader-btn" id="copyright" aria-label="Copyright">COPYRIGHT</button>
         </div>

@@ -452,6 +452,23 @@
         nextBtn.disabled = currentPage >= pageCount - 1;
     }
 
+    // --- Google Analytics: track the story being read ---
+    //
+    // Remembers the last story title we reported to GA so we only send an
+    // event when the reader actually moves to a different story, not on
+    // every page turn within the same story.
+    var trackedStoryTitle = null;
+
+    function trackStoryView(title) {
+        if (title === trackedStoryTitle) return;
+        trackedStoryTitle = title;
+        if (typeof gtag === "function") {
+            gtag("event", "story_view", {
+                story_title: title,
+            });
+        }
+    }
+
     // --- Page title ---
     //
     // Shows the title of the story the user is currently reading in the
@@ -504,6 +521,9 @@
             storyProgressFill.classList.remove("fully-transparent");
             pageTitleEl.classList.remove("fully-transparent");
         }
+
+        // Report the current story to Google Analytics (only when it changes)
+        trackStoryView(titleText);
     }
 
     // --- Story progress bar ---

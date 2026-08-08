@@ -195,6 +195,14 @@ body {
         a {
             font-weight: normal;
         }
+        
+        .reading-time {
+            font-size: .5em;
+            &::before {
+                content: " / ";
+                content: " / ";
+            }
+        }
     }
     
     h3 + p {
@@ -304,6 +312,24 @@ body {
     .quote {
         	margin: 0em 2em 2em 2em;	
     }
+    
+    .link-button a {
+        display: block;
+        text-align: center;
+        background: var(--reader-accent-light);
+        border: solid 1px var(--reader-border);        
+        border-radius: 3px;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 1em 0;        
+        padding: .5em 1em;
+        text-decoration: none;        
+    }
+    
+    .link-button a:hover {
+        background: var(--reader-accent);
+    }
+    
 
     // Prevent awkward breaks for short elements
     h1, h2, h3, blockquote, img {
@@ -311,67 +337,35 @@ body {
     }
     
 
+    // Default image (also used by h1#contents and h1#griffinfly)
     h1:after {
-        	display: block;
-        	margin-top: 2em;
+        display: block;
+        margin-top: 2em;
+        content: url("griffinfly.svg");
     }
     
-    h1#contents:after {
-    	    content: url("griffinfly.svg");
+    // IDs whose SVG filename differs from the default
+    $heading-decorations: "the-cephalopod", "the-holographic-principle",
+        "such-was-not-the-way-things-were", "top-quant", "senescence",
+        "never-of-the-past-or-the-future", "the-botanist";
+    
+    @each $id in $heading-decorations {
+        h1##{$id}:after {
+            content: url("#{$id}.svg");
+        }
     }
     
-    h1#griffinfly:after {
-    	    content: url("griffinfly.svg");
-    }
-            
-    h1#the-cephalopod:after {
-    	    content: url("the-cephalopod.svg");
-    }
-    
-    h1#the-holographic-principle:after {
-    	    content: url("the-holographic-principle.svg");
-    }
-    
-    h1#such-was-not-the-way-things-were:after {
-    	    content: url("such-was-not-the-way-things-were.svg");
-    }
-    
-    h1#top-quant:after {
-    	    content: url("top-quant.svg");
-    }
-
-    
-    h1#senescence:after {
-    	    content: url("senescence.svg");
-    }
-
-    // Dark mode: use dark-variant SVGs for heading decorations
+    // Dark mode: swap every heading decoration for its dark variant
     @media (prefers-color-scheme: dark) {
-        h1#contents:after,
-        h1#griffinfly:after {
+        h1:after {
             content: url("griffinfly-dark.svg");
         }
-
-        h1#the-cephalopod:after {
-            content: url("the-cephalopod-dark.svg");
+    
+        @each $id in $heading-decorations {
+            h1##{$id}:after {
+                content: url("#{$id}-dark.svg");
+            }
         }
-
-        h1#the-holographic-principle:after {
-            content: url("the-holographic-principle-dark.svg");
-        }
-
-        h1#such-was-not-the-way-things-were:after {
-            content: url("such-was-not-the-way-things-were-dark.svg");
-        }
-        
-        h1#top-quant:after {
-            content: url("top-quant-dark.svg");
-        }
-        
-        h1#senescence:after {
-            content: url("senescence-dark.svg");
-        }
-
     }
 }
 

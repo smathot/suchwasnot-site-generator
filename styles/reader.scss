@@ -269,6 +269,18 @@ body {
         color: var(--reader-accent);
     }
     
+    // Make sure the second paragraph always starts below the drop cap.
+    h1 + p + p {
+        clear: left;
+    }
+    
+    // When the drop cap overflows past the first paragraph (i.e. the second
+    // paragraph is pushed below it by `clear: left`), suppress the text
+    // indent so the paragraph starts flush left instead of looking indented.
+    h1 + p + p.drop-cap-cleared {
+        padding-top: 8px;
+    }
+    
     .right-note {
         font-family: $header-font;
         color: var(--reader-text-muted);

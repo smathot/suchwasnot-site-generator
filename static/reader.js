@@ -412,6 +412,7 @@
             updateButtons();
             updatePageTitle();
             updateStoryProgress();
+            updateDropCapIndent();
 
             // --- Initial position restore (runs only once) ---
             if (!initialPositionHandled) {
@@ -579,6 +580,51 @@
         }
 
         storyProgressFill.style.width = progress + "%";
+    }
+
+    // --- Drop cap indent adjustment ---
+    //
+    // When the first paragraph of a story is too short to fully contain the
+    // floated drop cap (.big-letter), the second paragraph is pushed below
+    // it by the CSS `clear: left` rule. In that case the text-indent looks
+    // awkward, so we add a class to suppress it. We detect the overflow by
+    // comparing the bottom edge of the .big-letter span against the bottom
+    // edge of its parent paragraph.
+    //
+    // This runs as part of recalculate() (on initial load, font load, and
+    // resize) since the drop cap's position relative to its paragraph only
+    // changes when the layout reflows — not when the reader turns pages.
+
+    function updateDropCapIndent() {
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var dropCaps = content.querySelectorAll(".big-letter");
+
+        for (var i = 0; i < dropCaps.length; i++) {
+            var dropCap = dropCaps[i];
+            var firstP = dropCap.parentElement;
+            if (!firstP || firstP.tagName !== "P") continue;
+
+            // Find the next sibling <p> (the second paragraph after h1 + p)
+            var secondP = firstP.nextElementSibling;
+            if (!secondP || secondP.tagName !== "P") continue;
+
+            var dropCapBottom = dropCap.getBoundingClientRect().bottom;
+            var firstPBottom = firstP.getBoundingClientRect().bottom;
+
+            if (dropCapBottom > firstPBottom) {
+                // Drop cap extends below the first paragraph — suppress indent
+                secondP.classList.add("drop-cap-cleared");
+            } else {
+                // Drop cap is fully contained — restore normal indent
+                secondP.classList.remove("drop-cap-cleared");
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
     }
 
     function goToPage(n) {

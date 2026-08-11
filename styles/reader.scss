@@ -154,7 +154,7 @@ body {
     // Force every section after the first to start on a new page
     & + .content-section {
         break-before: column;
-    }
+    }        
 
     h1, h2, h3 {
         color: var(--reader-accent);

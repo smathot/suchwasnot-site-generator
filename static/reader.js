@@ -14,6 +14,10 @@
     let isAnimating = false;
     let initialPositionHandled = false;    
 
+    // Firefox detection — used to gate the column-break workaround below.
+    // Firefox silently ignores break-before: column in multi-column layouts.
+    var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") !== -1;
+
     const viewport = document.querySelector(".reader__viewport");
     const content = document.getElementById("reader-content");
     const prevBtn = document.getElementById("prev-page");
@@ -369,6 +373,80 @@
         return Math.floor((offset + 1) / pageWidth);
     }
 
+    // --- Firefox column-break fix ---
+    //
+    // Firefox silently ignores break-before: column in multi-column layouts.
+    // This function walks through all H1 elements (each marking the start of
+    // a .content-section) in DOM order. If an H1 is not at the top of its
+    // column, a margin-top is added large enough to push it to the next
+    // column — simulating the break-before: column behaviour that other
+    // browsers get for free from CSS.
+    //
+    // Must be called after column-width is set and the browser has reflowed,
+    // but BEFORE pageCount is computed from content.scrollWidth — the added
+    // margins change the total content width (and thus the page count).
+
+    function fixFirefoxColumnBreaks() {
+        if (!isFirefox) return;
+
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        // Reset any previously applied margins (from a prior recalculate call
+        // triggered by resize, font load, or orientation change).
+        var headings = content.querySelectorAll("h1");
+        for (var i = 0; i < headings.length; i++) {
+            headings[i].style.marginTop = "";
+        }
+
+        // Force a synchronous reflow so positions reflect the reset.
+        void content.offsetHeight;
+
+        var contentRect = content.getBoundingClientRect();
+        var columnHeight = content.clientHeight;
+        var epsilon = 2; // absorb sub-pixel rounding at column boundaries
+
+        for (var i = 0; i < headings.length; i++) {
+            var h1 = headings[i];
+            var section = h1.closest(".content-section");
+            if (!section) continue;
+
+            // The section's padding-top determines where the H1 sits when it
+            // IS at the top of a column (right after the padding).
+            var paddingTop = parseFloat(
+                getComputedStyle(section).paddingTop
+            );
+
+            var h1Rect = h1.getBoundingClientRect();
+            var h1Top = h1Rect.top - contentRect.top;
+
+            // Vertical position of the H1 within its current column.
+            var verticalInColumn = h1Top % columnHeight;
+            if (verticalInColumn < 0) verticalInColumn += columnHeight;
+
+            if (verticalInColumn > paddingTop + epsilon) {
+                // H1 is not at the top of its column — push it to the next
+                // one. The margin fills the remaining column space plus the
+                // padding-top so the H1 lands at the same vertical position
+                // it would have if the section had started fresh on a new
+                // column.
+                var margin = columnHeight - verticalInColumn + paddingTop;
+                h1.style.marginTop = margin + "px";
+                // The content section itself doesn't have a padding on top,
+                // so we set this on the heading instead.
+                h1.style.paddingTop = "2em";
+
+                // Force a synchronous reflow so the next H1's position
+                // reflects this change before we measure it.
+                void content.offsetHeight;
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+    }
+
     function recalculate() {
         // Measure the viewport width — this is our initial "page width"
         // estimate.
@@ -380,6 +458,11 @@
 
         // Wait for the browser to reflow, then measure
         requestAnimationFrame(function () {
+            // Firefox fix: ensure each section starts on a new page.
+            // Must run before pageCount is computed because the added
+            // margins change content.scrollWidth.
+            fixFirefoxColumnBreaks();
+
             // Compute an approximate page count using our initial pageWidth
             // estimate. Use round instead of ceil to avoid creating a
             // spurious extra blank page from sub-pixel rounding noise.

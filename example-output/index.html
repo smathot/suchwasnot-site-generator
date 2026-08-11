@@ -1,0 +1,1632 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="griffinfly.png?v=c3b0e4b8" type="image/svg+xml">
+
+    <title>Title</title>
+
+    
+    <meta name="description" content="Description">
+    <meta name="author" content="Author">
+    <link rel="canonical" href="https://yourdomain.com/">
+
+    
+    <meta property="og:type" content="book">
+    <meta property="og:title" content="Title">
+    <meta property="og:description" content="Description">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:image" content="https://yourdomain.com/og-image.png">
+    <meta property="og:image:alt" content="Cover of Title">
+    <meta property="og:site_name" content="Title">
+    <meta property="book:author" content="Author">
+
+    
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Title">
+    <meta name="twitter:description" content="Description">
+    <meta name="twitter:image" content="https://yourdomain.com/og-image.png">
+
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": "Title",
+        "description": "Description",
+        "author": {
+            "@type": "Person",
+            "name": "Author"
+        },
+        "image": "https://yourdomain.com/og-image.png",
+        "url": "https://yourdomain.com/",
+        "inLanguage": "en",
+        "datePublished": "2026-08-11",
+        "publisher": {
+            "@type": "Person",
+            "name": "Author"
+        }
+    }
+    </script>
+
+    <style>
+        @charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:ital,wght@0,100..900;1,100..900&display=swap");
+:root {
+  --reader-body:           #fdf9ed;
+  --reader-border:         #93a1a1;
+  --reader-text:           #002b36;
+  --reader-text-muted:     #586e75;
+  --reader-accent:         #ce2714;
+  --reader-accent-light:   #ef6859;
+  --reader-text-light:     #006882;
+  --reader-body-overlay:   rgba(253, 249, 237, 0.97);
+  --reader-accent-translucent: rgba(206, 39, 20, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --reader-body:           #1a1a17;
+    --reader-border:         #4a4a44;
+    --reader-text:           #e8e0d0;
+    --reader-text-muted:     #8a8a7a;
+    --reader-accent:         #e84030;
+    --reader-accent-light:   #f06050;
+    --reader-text-light:     #c0b8a8;
+    --reader-body-overlay:   rgba(26, 26, 23, 0.97);
+    --reader-accent-translucent: rgba(232, 64, 48, 0.2);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--reader-body);
+  font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+  color: var(--reader-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.reader {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  align-items: center;
+}
+
+.reader__viewport {
+  width: 100%;
+  max-width: 42em;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.reader__content {
+  height: 100%;
+  column-gap: 0;
+  column-fill: auto;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  font-size: 1.125rem;
+  line-height: 170%;
+  text-align: justify;
+  hyphens: auto;
+}
+
+@media screen and (min-width: 45em) {
+  .reader__viewport {
+    padding: 1em 0em 1em 0em;
+  }
+  .content-section {
+    padding: 2em 0em;
+  }
+  blockquote {
+    padding-left: calc(0em - 3px);
+    padding-right: 0em;
+  }
+}
+
+@media screen and (max-width: 45em) {
+  .reader__viewport {
+    padding: 0em;
+  }
+  .content-section {
+    padding: 2em 1em;
+  }
+  blockquote {
+    padding-left: calc(1em - 3px);
+    padding-right: 1em;
+  }
+}
+
+.content-section {
+  min-height: 100%;
+}
+
+.content-section + .content-section {
+  break-before: column;
+}
+
+.content-section h1, .content-section h2, .content-section h3 {
+  color: var(--reader-accent);
+  font-family: "Jost", Arial, sans;
+  text-transform: uppercase;
+  font-weight: normal;
+  text-align: center;
+  break-after: avoid;
+}
+
+.content-section h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5em;
+}
+
+:target .content-section h1 {
+  animation: target-flash 1s ease;
+}
+
+.content-section h2 {
+  margin: 1em 0em;
+  break-after: avoid;
+  font-size: 1.25rem;
+}
+
+.content-section h2::before {
+  content: "– ";
+}
+
+.content-section h2::after {
+  content: " –";
+}
+
+.content-section h3 {
+  margin-top: 1em;
+}
+
+.content-section h3 a {
+  font-weight: normal;
+}
+
+.content-section h3 + p {
+  text-align: center;
+  font-size: .9em;
+  font-family: "Jost", Arial, sans;
+  color: var(--reader-text-muted);
+}
+
+.content-section h3 + p .reading-time {
+  font-size: .8em;
+  color: var(--reader-accent);
+}
+
+.content-section h3 + p .reading-time::before {
+  content: " / ";
+}
+
+.content-section p {
+  orphans: 2;
+  widows: 2;
+}
+
+.content-section p + p {
+  text-indent: 1.5em;
+}
+
+.content-section ul {
+  margin: 1em 0em 1em 1em;
+}
+
+.content-section a {
+  text-decoration: none;
+  font-weight: bold;
+  color: var(--reader-text);
+}
+
+.content-section a:hover {
+  text-decoration: underline;
+}
+
+.content-section a:visited {
+  color: var(--reader-text);
+}
+
+.content-section code {
+  white-space: pre-line;
+  line-height: 140%;
+  font-family: "Courier Prime";
+  font-size: .9em;
+}
+
+.content-section p + pre,
+.content-section pre + p,
+.content-section pre + pre {
+  margin-top: 1em;
+}
+
+.content-section .no-first-line-indent p {
+  text-indent: 0em !important;
+}
+
+.content-section .space-paragraphs p + p {
+  margin-top: 1em;
+}
+
+.content-section .big-letter {
+  font-size: 3.4em;
+  float: left;
+  line-height: 1;
+  margin-right: 0.1em;
+  margin-bottom: -.2em;
+  color: var(--reader-accent);
+}
+
+.content-section h1 + p + p {
+  clear: left;
+}
+
+.content-section h1 + p + p.drop-cap-cleared {
+  padding-top: 8px;
+}
+
+.content-section .right-note {
+  font-family: "Jost", Arial, sans;
+  color: var(--reader-text-muted);
+  font-size: .8em;
+  text-align: right;
+  margin-top: 0em !important;
+}
+
+.content-section .right-note + p {
+  margin-top: 0em !important;
+}
+
+.content-section hr {
+  border: none;
+  text-align: center;
+  margin: 2em 0;
+}
+
+.content-section hr::before {
+  content: "𖧹";
+  color: var(--reader-text-muted);
+}
+
+.content-section blockquote {
+  margin: 1.5em 0;
+  border-left: 3px solid var(--reader-accent-light);
+  font-style: italic;
+  color: var(--reader-text-light);
+}
+
+.content-section img {
+  max-width: 100%;
+  height: auto;
+  break-inside: avoid;
+  padding: 1px;
+}
+
+.content-section .quote p {
+  text-indent: 0em;
+}
+
+.content-section .quote {
+  margin: 0em 2em 2em 2em;
+}
+
+.content-section .link-button a {
+  display: block;
+  text-align: center;
+  background: var(--reader-accent-light);
+  border: solid 1px var(--reader-border);
+  border-radius: 3px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 1em 0;
+  padding: .5em 1em;
+  text-decoration: none;
+}
+
+.content-section .link-button a:hover {
+  background: var(--reader-accent);
+}
+
+.content-section h1, .content-section h2, .content-section h3, .content-section blockquote, .content-section img {
+  break-inside: avoid-column;
+}
+
+.content-section h1:after {
+  display: block;
+  margin-top: 2em;
+  content: url("griffinfly.svg");
+}
+
+.content-section h1#the-cephalopod:after {
+  content: url("the-cephalopod.svg");
+}
+
+.content-section h1#the-holographic-principle:after {
+  content: url("the-holographic-principle.svg");
+}
+
+.content-section h1#such-was-not-the-way-things-were:after {
+  content: url("such-was-not-the-way-things-were.svg");
+}
+
+.content-section h1#top-quant:after {
+  content: url("top-quant.svg");
+}
+
+.content-section h1#senescence:after {
+  content: url("senescence.svg");
+}
+
+.content-section h1#never-of-the-past-or-the-future:after {
+  content: url("never-of-the-past-or-the-future.svg");
+}
+
+.content-section h1#the-botanist:after {
+  content: url("the-botanist.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  .content-section h1:after {
+    content: url("griffinfly-dark.svg");
+  }
+  .content-section h1#the-cephalopod:after {
+    content: url("the-cephalopod-dark.svg");
+  }
+  .content-section h1#the-holographic-principle:after {
+    content: url("the-holographic-principle-dark.svg");
+  }
+  .content-section h1#such-was-not-the-way-things-were:after {
+    content: url("such-was-not-the-way-things-were-dark.svg");
+  }
+  .content-section h1#top-quant:after {
+    content: url("top-quant-dark.svg");
+  }
+  .content-section h1#senescence:after {
+    content: url("senescence-dark.svg");
+  }
+  .content-section h1#never-of-the-past-or-the-future:after {
+    content: url("never-of-the-past-or-the-future-dark.svg");
+  }
+  .content-section h1#the-botanist:after {
+    content: url("the-botanist-dark.svg");
+  }
+}
+
+.content-section--image {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0em;
+}
+
+.content-section--image img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border: solid 1px var(--reader-border);
+}
+
+.slideshow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slideshow__slide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.slideshow__slide--active {
+  opacity: 1;
+}
+
+@keyframes target-flash {
+  0% {
+    background: var(--reader-accent-translucent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.reader__controls {
+  width: 100%;
+  max-width: 42em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5em;
+  padding: 0.75em 1em;
+  background: transparent;
+  user-select: none;
+  font-family: "Jost", Arial, sans;
+  color: var(--reader-text-muted);
+  font-size: .8rem;
+}
+
+.reader__controls button {
+  color: var(--reader-text-muted);
+  font-size: .8rem;
+  border: none;
+  background: none;
+}
+
+.reader__controls .reader__nav--prev,
+.reader__controls .reader__nav--next {
+  cursor: pointer;
+}
+
+.reader__controls .reader__nav--prev:hover,
+.reader__controls .reader__nav--next:hover {
+  color: var(--reader-accent);
+}
+
+.fully-transparent {
+  opacity: 0%;
+}
+
+.reader-btn {
+  color: var(--reader-text-muted);
+  font-family: "Jost", Arial, sans;
+  font-size: .8rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.5em 0;
+  transition: color 0.2s ease;
+}
+
+.reader-btn:hover {
+  color: var(--reader-accent);
+}
+
+.story-progress {
+  width: 100%;
+  max-width: 42em;
+  height: 2px;
+  background: transparent;
+  position: relative;
+}
+
+.story-progress__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--reader-text-muted);
+  transition: width 0.3s ease;
+}
+
+.dialog-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--reader-body-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2em;
+  overflow-y: auto;
+}
+
+.dialog-modal[hidden] {
+  display: none;
+}
+
+.dialog-modal p {
+  text-align: center;
+}
+
+.dialog-modal p a {
+  color: var(--reader-accent);
+}
+
+.dialog-modal__close {
+  border: none;
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  background: none;
+  button: none;
+  font-size: 1.5rem;
+  color: var(--reader-text-muted);
+  cursor: pointer;
+  padding: 0.5em;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.dialog-modal__close:hover {
+  color: var(--reader-accent);
+}
+
+.dialog-modal__close:focus {
+  outline: 2px solid var(--reader-accent);
+  outline-offset: 2px;
+}
+
+.dialog-modal__nav {
+  max-width: 24em;
+  width: 100%;
+}
+
+.dialog-modal__title {
+  font-family: "Jost", Arial, sans;
+  font-size: 1.25rem;
+  color: var(--reader-accent);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 2em;
+  font-weight: normal;
+}
+
+.dialog-modal__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dialog-modal__item {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.dialog-modal__item:last-child {
+  margin-bottom: 0;
+}
+
+.dialog-modal__link, .copy-link-btn {
+  font-family: "Jost", Arial, sans;
+  color: var(--reader-text);
+  text-decoration: none;
+  font-weight: normal;
+  transition: color 0.2s ease;
+}
+
+.dialog-modal__link:hover, .copy-link-btn:hover {
+  color: var(--reader-accent);
+  text-decoration: underline;
+}
+
+.dialog-modal__link:focus, .copy-link-btn:focus {
+  outline: 2px solid var(--reader-accent);
+  outline-offset: 4px;
+}
+
+.copy-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline;
+  padding: 0;
+}
+
+.copy-link-btn--copied {
+  color: var(--reader-accent);
+}
+
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '');
+    </script>    
+</head>
+<body>
+    <div id="reader" class="reader">
+        <div class="story-progress" id="story-progress">
+            <div class="story-progress__fill" id="story-progress-fill"></div>
+        </div>
+        <div class="reader__controls reader__controls--top">
+            <button class="reader-btn" id="share-btn" aria-label="Share this story">SHARE</button>
+            <button class="reader__page-title reader-btn" id="page-title">SUCHWASNOT</button>
+            <button class="reader-btn" id="follow-btn" aria-label="Follow on social media">FOLLOW</button>
+        </div>
+
+        <div class="reader__viewport">            
+            <div class="reader__content" id="reader-content">
+                
+                <div class="content-section"
+                     data-slug="contents">
+                    <h1 id="contents">Example Page</h1>
+<p><span class="big-letter">E</span>xample Content</p>
+                </div>
+                
+            </div>
+
+            
+            <div class="dialog-modal" id="toc-modal" hidden>
+                <button class="dialog-modal__close" id="toc-close" aria-label="Close table of contents">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Contents</h2>
+                    <ul class="dialog-modal__list">
+                        
+                        <li class="dialog-modal__item">
+                            <a href="#contents" class="dialog-modal__link">Example Content</a>
+                        </li>
+                        
+                    </ul>
+                </nav>
+            </div>
+
+            
+            <div class="dialog-modal" id="copyright-modal" hidden>
+                <button class="dialog-modal__close" id="copyright-close" aria-label="Close copyright section">&#10005;</button>
+                <h2 class="dialog-modal__title">Copyright</h2>
+                <p>Copyright © 2026 Author.</p> <p>All rights reserved.</p>
+
+            </div>
+
+            
+            <div class="dialog-modal" id="share-modal" hidden>
+                <button class="dialog-modal__close" id="share-close" aria-label="Close share dialog">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Share</h2>
+                    <ul class="dialog-modal__list">
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://bsky.app/intent/compose?text=Share%20text" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Bluesky</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://mastodonshare.com/?text=Share%20text&amp;url=https%3A%2F%2Fyourdomain.com%2F" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Mastodon</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://twitter.com/intent/tweet?text=Share%20text&amp;url=https%3A%2F%2Fyourdomain.com%2F" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">X</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fyourdomain.com%2F" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Facebook</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fyourdomain.com%2F&amp;title=Title" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Reddit</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://www.tumblr.com/widgets/share/tool?canonicalUrl=https%3A%2F%2Fyourdomain.com%2F&amp;title=Title" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Tumblr</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fyourdomain.com%2F" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">LinkedIn</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <a href="mailto:?subject=Title&amp;body=Share%20text%0A%0Ahttps%3A%2F%2Fyourdomain.com%2F" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Email</a>
+                        </li>
+                        
+                        <li class="dialog-modal__item">
+                            <button class="copy-link-btn" id="copy-link-btn" aria-label="Copy link to clipboard">Copy Link</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            
+            <div class="dialog-modal" id="follow-modal" hidden>
+                <button class="dialog-modal__close" id="follow-close" aria-label="Close follow dialog">&#10005;</button>
+                <nav class="dialog-modal__nav">
+                    <h2 class="dialog-modal__title">Follow</h2>
+                    <ul class="dialog-modal__list">
+                        
+                        <li class="dialog-modal__item">
+                            <a href="https://bsky.app/profile/yourhandle.bsky.social" target="_blank" rel="noopener noreferrer" class="dialog-modal__link">Bluesky</a>
+                        </li>
+                        
+                    </ul>
+                </nav>
+            </div>            
+        </div>
+
+        <div class="reader__controls reader__controls--bottom">
+            <button class="reader__nav reader__nav--contents reader-btn" id="toc" aria-label="Contents">CONTENTS</button>
+            <div id="reader__nav--page-controls">
+                <button class="reader__nav reader__nav--prev" id="prev-page" aria-label="Previous page">&#9664;</button>
+                <span class="reader__page-indicator" id="page-indicator">1 / 1</span>
+                <button class="reader__nav reader__nav--next" id="next-page" aria-label="Next page">&#9654;</button>
+            </div>
+            <button class="reader__nav reader__nav--contents reader-btn" id="copyright" aria-label="Copyright">COPYRIGHT</button>
+        </div>
+    </div>
+
+    <script>
+        // E-Reader Pagination Controller
+// Uses CSS multi-column layout for content reflow, with JS for navigation.
+//
+// Key fix: CSS column-width does NOT accept percentage values.
+// We must set it dynamically in JS to the viewport width in pixels so the
+// browser creates exactly the right number of columns (pages).
+
+(function () {
+    "use strict";
+    
+    let currentPage = 0;
+    let pageCount = 1;
+    let pageWidth = 0;
+    let isAnimating = false;
+    let initialPositionHandled = false;    
+
+    const viewport = document.querySelector(".reader__viewport");
+    const content = document.getElementById("reader-content");
+    const prevBtn = document.getElementById("prev-page");
+    const nextBtn = document.getElementById("next-page");
+    const indicator = document.getElementById("page-indicator");
+    const pageTitleEl = document.getElementById("page-title");
+    const storyProgressFill = document.getElementById("story-progress-fill");
+
+    // --- Modal references ---
+    const tocBtn = document.getElementById("toc");
+    const tocModal = document.getElementById("toc-modal");
+    const tocClose = document.getElementById("toc-close");
+    const copyrightBtn = document.getElementById("copyright");
+    const copyrightModal = document.getElementById("copyright-modal");
+    const copyrightClose = document.getElementById("copyright-close");
+    const shareBtn = document.getElementById("share-btn");
+    const shareModal = document.getElementById("share-modal");
+    const shareClose = document.getElementById("share-close");
+    const followBtn = document.getElementById("follow-btn");
+    const followModal = document.getElementById("follow-modal");
+    const followClose = document.getElementById("follow-close");
+    const copyLinkBtn = document.getElementById("copy-link-btn");
+
+    // --- All modals list (for checking if any modal is open) ---
+    var allModals = [tocModal, copyrightModal, shareModal, followModal];
+
+    function isAnyModalOpen() {
+        for (var i = 0; i < allModals.length; i++) {
+            if (!allModals[i].hidden) return true;
+        }
+        return false;
+    }
+
+    // --- Generic modal helpers ---
+
+    function openModal(modal) {
+        modal.hidden = false;
+    }
+
+    function closeModal(modal) {
+        modal.hidden = true;
+    }
+
+    function isModalOpen(modal) {
+        return !modal.hidden;
+    }
+
+    function toggleModal(modal) {
+        if (isModalOpen(modal)) {
+            closeModal(modal);
+        } else {
+            openModal(modal);
+        }
+    }
+
+    // Close all modals (used before opening a new one if desired)
+    function closeAllModals() {
+        for (var i = 0; i < allModals.length; i++) {
+            closeModal(allModals[i]);
+        }
+    }
+
+    // --- COPYRIGHT modal ---
+
+    copyrightBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(tocModal);
+        closeModal(shareModal);
+        closeModal(followModal);
+        toggleModal(copyrightModal);
+    });
+
+    copyrightClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(copyrightModal);
+    });
+
+    // --- TOC modal ---
+    pageTitleEl.addEventListener("click", function (e) {
+        tocBtn.click();
+    });
+
+    tocBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(copyrightModal);
+        closeModal(shareModal);
+        closeModal(followModal);
+        toggleModal(tocModal);
+    });
+
+    tocClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(tocModal);
+    });
+
+    // Handle TOC link clicks: navigate to the section and close the modal
+    tocModal.addEventListener("click", function (e) {
+        var link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        var hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+
+        e.preventDefault();
+        closeModal(tocModal);
+        goToAnchor(hash);
+    });
+
+    // --- SHARE modal ---
+
+    function openShareDialog() {
+        closeModal(tocModal);
+        closeModal(copyrightModal);
+        closeModal(followModal);
+        openModal(shareModal);
+    }
+
+    shareBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // If navigator.share is available, use the native share sheet.
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: window.location.href,
+            }).catch(function () {
+                // User cancelled or share failed — do nothing
+            });
+        } else {
+            // Fall back to our custom share dialog
+            openShareDialog();
+        }
+    });
+
+    shareClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(shareModal);
+    });
+
+    // --- Copy Link ---
+
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var url = window.location.href;
+            var originalText = copyLinkBtn.textContent;
+
+            // Try the modern Clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () {
+                    copyLinkBtn.textContent = "Link Copied!";
+                    copyLinkBtn.classList.add("copy-link-btn--copied");
+                    setTimeout(function () {
+                        copyLinkBtn.textContent = originalText;
+                        copyLinkBtn.classList.remove("copy-link-btn--copied");
+                    }, 2000);
+                }).catch(function () {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+
+            function fallbackCopy(text) {
+                var textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand("copy");
+                    copyLinkBtn.textContent = "Link Copied!";
+                    copyLinkBtn.classList.add("copy-link-btn--copied");
+                    setTimeout(function () {
+                        copyLinkBtn.textContent = originalText;
+                        copyLinkBtn.classList.remove("copy-link-btn--copied");
+                    }, 2000);
+                } catch (err) {
+                    // Copy failed — leave button as is
+                }
+                document.body.removeChild(textarea);
+            }
+        });
+    }
+
+    // --- FOLLOW modal ---
+
+    followBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(shareModal);
+        closeModal(copyrightModal);
+        closeModal(tocModal);
+        toggleModal(followModal);
+    });
+
+    followClose.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal(followModal);
+    });
+
+    // --- Close any modal on Escape ---
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isAnyModalOpen()) {
+            e.preventDefault();
+            closeAllModals();
+        }
+    });
+
+    // --- Cookie helpers ---
+
+    var COOKIE_NAME = "readerPos";
+    var COOKIE_DAYS = 365;
+
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return decodeURIComponent(c.substring(nameEQ.length));
+            }
+        }
+        return null;
+    }
+
+    // --- Position persistence ---
+    //
+    // We store the reading position as a fraction of total content width
+    // (0.0 to 1.0), not as a page number. This way, if the window is resized
+    // or fonts load differently, the fraction still points to roughly the
+    // same spot in the text stream.
+
+    // currentFraction is updated whenever we reach a stable layout state
+    // (end of recalculate, or after goToPage). It is read by recalculate()
+    // to restore the reading position across reflows. We CANNOT recompute
+    // it from the DOM at the start of recalculate() because by then the
+    // browser has already reflowed with the old column-width but the new
+    // viewport size, making content.scrollWidth stale.
+    var currentFraction = 0;
+
+    function updateFraction() {
+        if (pageWidth > 0 && content.scrollWidth > 0) {
+            currentFraction = (currentPage * pageWidth) / content.scrollWidth;
+        }
+    }
+
+    function savePosition() {
+        updateFraction();
+        if (pageWidth === 0 || pageCount <= 1) return;
+        setCookie(COOKIE_NAME, currentFraction, COOKIE_DAYS);
+    }
+
+    function restoreFromCookie() {
+        var raw = getCookie(COOKIE_NAME);
+        if (raw === null) return null;
+        var fraction = parseFloat(raw);
+        if (isNaN(fraction) || fraction < 0 || fraction > 1) return null;
+        return fractionToPage(fraction);
+    }
+
+    // --- Fraction / page conversion ---
+    //
+    // Converts a fractional position (0.0–1.0 of total content width) to a
+    // page index, clamped to valid range. Uses the CURRENT content.scrollWidth
+    // and pageWidth (i.e. the post-reflow values) to map the old proportional
+    // position onto the new page layout.
+
+    function fractionToPage(fraction) {
+        var pixelPos = fraction * content.scrollWidth;
+        var page = Math.round(pixelPos / pageWidth);
+        return Math.max(0, Math.min(page, pageCount - 1));
+    }
+
+    // --- Slideshow management ---
+
+    var slideshows = [];
+
+    function initSlideshows() {
+        slideshows = [];
+        var containers = document.querySelectorAll(".slideshow");
+        for (var i = 0; i < containers.length; i++) {
+            var slides = containers[i].querySelectorAll(".slideshow__slide");
+            if (slides.length <= 1) continue;
+
+            var slideshow = {
+                slides: slides,
+                current: 0,
+                timer: null,
+            };
+            slideshows.push(slideshow);
+
+            // Start the slideshow (advance from first slide)
+            advanceSlideshow(slideshow);
+        }
+    }
+
+    function advanceSlideshow(slideshow) {
+        // If already on last slide, stop
+        if (slideshow.current >= slideshow.slides.length - 1) return;
+
+        var duration = parseFloat(
+            slideshow.slides[slideshow.current].getAttribute("data-duration")
+        );
+        if (!duration || duration <= 0) duration = 2;
+
+        slideshow.timer = setTimeout(function () {
+            // Deactivate current slide
+            slideshow.slides[slideshow.current].classList.remove("slideshow__slide--active");
+
+            // Activate next slide
+            slideshow.current++;
+            slideshow.slides[slideshow.current].classList.add("slideshow__slide--active");
+
+            // Continue if not on last slide
+            if (slideshow.current < slideshow.slides.length - 1) {
+                advanceSlideshow(slideshow);
+            }
+        }, duration * 1000);
+    }
+
+    // --- Page calculation helper ---
+    //
+    // Maps a pixel offset (relative to the content's left edge) to a page
+    // index. A 1px epsilon is added before the floor division to absorb
+    // sub-pixel rounding noise from getBoundingClientRect() at column
+    // boundaries. Without this, an element at the very start of page N
+    // might report an offset of N×pageWidth − 0.4, which floors to page
+    // N−1 — causing wrong-page navigation and title visibility bugs.
+
+    function pageOfOffset(offset) {
+        return Math.floor((offset + 1) / pageWidth);
+    }
+
+    function recalculate() {
+        // Measure the viewport width — this is our initial "page width"
+        // estimate.
+        pageWidth = viewport.clientWidth;
+        if (pageWidth === 0) return;
+
+        // Set column-width to exactly the viewport width in pixels.
+        content.style.columnWidth = pageWidth + "px";
+
+        // Wait for the browser to reflow, then measure
+        requestAnimationFrame(function () {
+            // Compute an approximate page count using our initial pageWidth
+            // estimate. Use round instead of ceil to avoid creating a
+            // spurious extra blank page from sub-pixel rounding noise.
+            pageCount = Math.max(1, Math.round(content.scrollWidth / pageWidth));
+
+            // Refine pageWidth to match the browser's ACTUAL column width.
+            // The column-width property is only a suggestion; the browser
+            // may use a slightly different value internally. Dividing the
+            // real scrollWidth by pageCount gives us the true per-page width,
+            // so our transforms align perfectly with column boundaries.
+            if (pageCount > 0) {
+                pageWidth = content.scrollWidth / pageCount;
+            }
+
+            // Restore the reading position. On the first call
+            // (!initialPositionHandled), we skip this and let the
+            // initialPositionHandled block below handle navigation (cookie
+            // or URL hash). On subsequent calls (resize, zoom, orientation
+            // change), we use currentFraction — which was captured during
+            // the last stable layout — to jump to the same proportional
+            // position in the newly reflowed content.
+            if (initialPositionHandled) {
+                currentPage = fractionToPage(currentFraction);
+            } else if (currentPage >= pageCount) {
+                currentPage = pageCount - 1;
+            }
+
+            applyTransform();
+            updateIndicator();
+            updateButtons();
+            updatePageTitle();
+            updateStoryProgress();
+            updateDropCapIndent();
+
+            // --- Initial position restore (runs only once) ---
+            if (!initialPositionHandled) {
+                initialPositionHandled = true;
+
+                // Priority: cookie > URL hash > start
+                var restoredPage = restoreFromCookie();
+                if (restoredPage !== null) {
+                    goToPage(restoredPage);
+                } else if (location.hash) {
+                    goToAnchor(location.hash);
+                }
+
+                // Clear any URL hash so it doesn't persist across reloads.
+                // replaceState doesn't trigger a hashchange event.
+                if (location.hash) {
+                    history.replaceState(
+                        null, null,
+                        window.location.pathname + window.location.search
+                    );
+                }
+            }
+
+            savePosition();
+        });
+    }
+
+    function applyTransform() {
+        content.style.transform = "translateX(" + (-currentPage * pageWidth) + "px)";
+    }
+
+    function updateIndicator() {
+        indicator.textContent = (currentPage + 1) + " / " + pageCount;
+    }
+
+    function updateButtons() {
+        prevBtn.disabled = currentPage <= 0;
+        nextBtn.disabled = currentPage >= pageCount - 1;
+    }
+
+    // --- Google Analytics: track the story being read ---
+    //
+    // Remembers the last story title we reported to GA so we only send an
+    // event when the reader actually moves to a different story, not on
+    // every page turn within the same story.
+    var trackedStoryTitle = null;
+
+    function trackStoryView(title) {
+        if (title === trackedStoryTitle) return;
+        trackedStoryTitle = title;
+        if (typeof gtag === "function") {
+            gtag("event", "story_view", {
+                story_title: title,
+            });
+        }
+    }
+
+    // --- Page title ---
+    //
+    // Shows the title of the story the user is currently reading in the
+    // #page-title span. The "current story" is the last H1 that appears
+    // on or before the current page. When the H1 itself is visible on the
+    // current page, the span is made transparent (but still occupies space)
+    // to avoid showing the title twice. If no H1 precedes the current page,
+    // the default book title is shown transparently.
+
+    function updatePageTitle() {
+        if (!pageTitleEl) return;
+
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var contentRect = content.getBoundingClientRect();
+        var headings = content.querySelectorAll("h1");
+        var titleText = "suchwasnot";
+        var titleHidden = true;
+
+        for (var i = 0; i < headings.length; i++) {
+            var h1Rect = headings[i].getBoundingClientRect();
+            var h1Left = h1Rect.left - contentRect.left;
+            var h1Page = pageOfOffset(h1Left);
+
+            if (h1Page < currentPage) {
+                // H1 is on a previous page — remember it as current story title
+                titleText = headings[i].textContent;
+                titleHidden = false;
+            } else if (h1Page === currentPage) {
+                // H1 is visible on the current page — transparent to avoid duplication
+                titleText = headings[i].textContent;
+                titleHidden = true;
+                break;
+            } else {
+                // H1 is on a future page — no need to look further
+                break;
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+
+        pageTitleEl.textContent = titleText.toUpperCase();
+        if (titleHidden) {
+            storyProgressFill.classList.add("fully-transparent");
+            pageTitleEl.classList.add("fully-transparent");
+        } else {
+            storyProgressFill.classList.remove("fully-transparent");
+            pageTitleEl.classList.remove("fully-transparent");
+        }
+
+        // Report the current story to Google Analytics (only when it changes)
+        trackStoryView(titleText);
+    }
+
+    // --- Story progress bar ---
+    //
+    // Fills the #story-progress bar to show how far along the current story
+    // we are. The "current story" starts at the page of the last H1 on or
+    // before the current page, and ends at the page before the next H1 (or
+    // the last page if there is no next H1). If there is no preceding H1,
+    // the bar is empty.
+
+    function updateStoryProgress() {
+        if (!storyProgressFill) return;
+        if (pageWidth === 0) return;
+
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var contentRect = content.getBoundingClientRect();
+        var headings = content.querySelectorAll("h1");
+
+        var startPage = -1;
+        var endPage = pageCount - 1;
+
+        for (var i = 0; i < headings.length; i++) {
+            var h1Rect = headings[i].getBoundingClientRect();
+            var h1Left = h1Rect.left - contentRect.left;
+            var h1Page = pageOfOffset(h1Left);
+
+            if (h1Page <= currentPage) {
+                // This H1 is on or before the current page — it's our story start
+                startPage = h1Page;
+            } else {
+                // This H1 is on a future page — the story ends just before it
+                endPage = h1Page - 1;
+                break;
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+
+        var progress = 0;
+
+        if (startPage >= 0) {
+            if (endPage <= startPage) {
+                // Single-page story — we're on it, so 100%
+                progress = 100;
+            } else {
+                progress = ((currentPage - startPage) / (endPage - startPage)) * 100;
+                progress = Math.max(0, Math.min(100, progress));
+            }
+        }
+
+        storyProgressFill.style.width = progress + "%";
+    }
+
+    // --- Drop cap indent adjustment ---
+    //
+    // When the first paragraph of a story is too short to fully contain the
+    // floated drop cap (.big-letter), the second paragraph is pushed below
+    // it by the CSS `clear: left` rule. In that case the text-indent looks
+    // awkward, so we add a class to suppress it. We detect the overflow by
+    // comparing the bottom edge of the .big-letter span against the bottom
+    // edge of its parent paragraph.
+    //
+    // This runs as part of recalculate() (on initial load, font load, and
+    // resize) since the drop cap's position relative to its paragraph only
+    // changes when the layout reflows — not when the reader turns pages.
+
+    function updateDropCapIndent() {
+        // Temporarily reset transform so getBoundingClientRect returns
+        // true positions in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var dropCaps = content.querySelectorAll(".big-letter");
+
+        for (var i = 0; i < dropCaps.length; i++) {
+            var dropCap = dropCaps[i];
+            var firstP = dropCap.parentElement;
+            if (!firstP || firstP.tagName !== "P") continue;
+
+            // Find the next sibling <p> (the second paragraph after h1 + p)
+            var secondP = firstP.nextElementSibling;
+            if (!secondP || secondP.tagName !== "P") continue;
+
+            var dropCapBottom = dropCap.getBoundingClientRect().bottom;
+            var firstPBottom = firstP.getBoundingClientRect().bottom;
+
+            if (dropCapBottom > firstPBottom) {
+                // Drop cap extends below the first paragraph — suppress indent
+                secondP.classList.add("drop-cap-cleared");
+            } else {
+                // Drop cap is fully contained — restore normal indent
+                secondP.classList.remove("drop-cap-cleared");
+            }
+        }
+
+        // Restore the transform
+        applyTransform();
+    }
+
+    function goToPage(n) {
+        if (isAnimating) return;
+        var target = Math.max(0, Math.min(n, pageCount - 1));
+        if (target === currentPage) return;
+
+        isAnimating = true;
+        currentPage = target;
+        applyTransform();
+        updatePageTitle();
+        updateStoryProgress();
+
+        setTimeout(function () {
+            isAnimating = false;
+        }, 300);
+
+        updateIndicator();
+        updateButtons();
+        savePosition();
+    }
+
+    function goToAnchor(hash) {
+        if (!hash || hash === "#" || pageWidth === 0) return;
+
+        var id = hash.substring(1);
+        var el = document.getElementById(id);
+        if (!el) return;
+
+        // Temporarily reset the transform so getBoundingClientRect returns
+        // the element's true position in the untransformed content flow.
+        content.style.transform = "translateX(0)";
+
+        var elRect = el.getBoundingClientRect();
+        var contentRect = content.getBoundingClientRect();
+        var offset = elRect.left - contentRect.left;
+        var page = pageOfOffset(offset);
+
+        // Restore the transform
+        applyTransform();
+
+        if (page < 0) page = 0;
+        if (page >= pageCount) page = pageCount - 1;
+
+        goToPage(page);
+    }
+
+    function goToHome() {
+        goToPage(0);
+    }
+
+    function nextPage() {
+        goToPage(currentPage + 1);
+    }
+
+    function prevPage() {
+        goToPage(currentPage - 1);
+    }
+
+    // --- Button clicks ---
+    prevBtn.addEventListener("click", prevPage);
+    nextBtn.addEventListener("click", nextPage);
+
+    // --- Keyboard navigation ---
+    document.addEventListener("keydown", function (e) {
+        // Skip keyboard navigation when any modal is open (except Escape,
+        // which is handled by its own listener above).
+        if (isAnyModalOpen()) return;
+
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+            e.preventDefault();
+            nextPage();
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+            e.preventDefault();
+            prevPage();
+        } else if (e.key === "Home") {
+            e.preventDefault();
+            goToPage(0);
+        } else if (e.key === "End") {
+            e.preventDefault();
+            goToPage(pageCount - 1);
+        }
+    });
+
+    // --- Anchor link click interception ---
+    // Intercept clicks on in-page anchor links (href="#...") to prevent the
+    // browser's default scroll-to behavior, which interferes with our
+    // transform-based pagination. We navigate to the correct page and save
+    // the position in a cookie — the URL hash is NOT updated.
+    content.addEventListener("click", function (e) {
+        var link = e.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        var hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+
+        e.preventDefault();
+        goToAnchor(hash);
+    });
+
+    // --- Hash change (external sources only) ---
+    // Handles cases where the hash is changed by something other than our
+    // own click handler — e.g. the user manually edits the URL, or navigates
+    // here from an external link with a hash.
+    window.addEventListener("hashchange", function () {
+        if (location.hash) {
+            goToAnchor(location.hash);
+        }
+    });
+
+    // --- Click / tap to advance ---
+    //
+    // A click or tap on the viewport that is NOT part of a drag/swipe
+    // advances to the next page. The dragOccurred flag is set by the
+    // mouse/touch handlers below when a drag or swipe is detected, so
+    // this handler can safely skip those cases.
+    var dragOccurred = false;
+
+    viewport.addEventListener("click", function (e) {
+        if (dragOccurred) return;
+        // Don't advance when clicking links (handled by anchor interception)
+        if (e.target.closest("a")) return;
+        // Don't advance when any modal is open
+        if (isAnyModalOpen()) return;
+        nextPage();
+    });
+
+    // --- Touch / swipe navigation ---
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchActive = false;
+
+    viewport.addEventListener("touchstart", function (e) {
+        if (isAnyModalOpen()) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchActive = true;
+        dragOccurred = false;
+    }, { passive: true });
+
+    viewport.addEventListener("touchend", function (e) {
+        if (!touchActive) return;
+        touchActive = false;
+
+        var endX = e.changedTouches[0].clientX;
+        var endY = e.changedTouches[0].clientY;
+        var dx = endX - touchStartX;
+        var dy = endY - touchStartY;
+
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            dragOccurred = true;
+            if (dx < 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+        }
+    }, { passive: true });
+
+    // --- Mouse drag navigation ---
+    var mouseStartX = 0;
+    var mouseActive = false;
+
+    viewport.addEventListener("mousedown", function (e) {
+        if (isAnyModalOpen()) return;
+        if (e.target.closest(".reader__controls")) return;
+        mouseStartX = e.clientX;
+        mouseActive = true;
+        dragOccurred = false;
+    });
+
+    document.addEventListener("mouseup", function (e) {
+        if (!mouseActive) return;
+        mouseActive = false;
+
+        var dx = e.clientX - mouseStartX;
+        if (Math.abs(dx) > 50) {
+            dragOccurred = true;
+            if (dx < 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+        }
+    });
+
+    // --- Mouse wheel navigation ---
+    var wheelTimeout = null;
+    viewport.addEventListener("wheel", function (e) {
+        if (isAnyModalOpen()) return;
+        e.preventDefault();
+        if (isAnimating || wheelTimeout) return;
+
+        var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (delta !== 0) {
+            if (delta > 0) {
+                nextPage();
+            } else {
+                prevPage();
+            }
+            wheelTimeout = setTimeout(function () {
+                wheelTimeout = null;
+            }, 400);
+        }
+    }, { passive: false });
+
+    // --- Window resize: recalculate pages ---
+    var resizeTimeout = null;
+    window.addEventListener("resize", function () {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(recalculate, 150);
+    });
+
+    // --- Initialise ---
+    initSlideshows();
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(recalculate);
+    } else {
+        setTimeout(recalculate, 100);
+    }
+
+    recalculate();
+})();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "suchwasnot-site-generator"
+version = "1.0.0"
+description = "Static site generator for e-reader style web books"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [{ name = "Sebastiaan Mathôt", email = "s.mathot@cogsci.nl" }]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "PyYAML",
+    "Markdown",
+    "libsass",
+    "Jinja2",
+]
+
+[project.urls]
+Homepage = "https://github.com/smathot/suchwasnot-site-generator"
+
+[tool.setuptools]
+py-modules = ["build"]

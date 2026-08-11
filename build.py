@@ -459,7 +459,7 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     # Copy images to output
     copy_resources(resources_dir, output_dir)
 
-    print(f"\nDone! {len(sections)} section(s) built to {output_path.relative_to(ROOT)}")
+    print(f"\nDone! {len(sections)} section(s) built to {output_path}")
 
 
 if __name__ == "__main__":

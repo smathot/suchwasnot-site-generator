@@ -1,0 +1,30 @@
+# Example content for the SWN static site generator.
+#
+# This file demonstrates all supported section types:
+#   - Slideshow (list of slides with source + duration)
+#   - Markdown story (dict with source + title)
+#   - Image (dict with source, image extension auto-detected)
+
+# --- Metadata ---
+meta_title: "Title"
+meta_description: "Description"
+author: "Author"
+canonical_url: "https://yourdomain.com/"
+og_image: "https://yourdomain.com/og-image.png"
+google_analytics_id: ""
+copyright: >
+  <p>Copyright © 2026 Author.</p>
+  <p>All rights reserved.</p>
+
+# --- Share / follow ---
+share_title: "Title"
+share_text: "Share text"
+follow:
+  bluesky: "https://bsky.app/profile/yourhandle.bsky.social"
+  # mastodon: ""
+
+# --- Content sections (order is preserved) ---
+content:
+  contents:
+    source: md/example-content.md
+    title: Example Content

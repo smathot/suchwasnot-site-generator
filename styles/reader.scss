@@ -194,15 +194,7 @@ body {
         margin-top: 1em;
         a {
             font-weight: normal;
-        }
-        
-        .reading-time {
-            font-size: .5em;
-            &::before {
-                content: " / ";
-                content: " / ";
-            }
-        }
+        }                
     }
     
     h3 + p {
@@ -210,6 +202,14 @@ body {
         font-size: .9em;
         font-family: $header-font;
         color: var(--reader-text-muted);
+        
+        .reading-time {
+            font-size: .8em;
+            color: var(--reader-accent);
+            &::before {
+                content: " / ";
+            }
+        }        
     }
 
     p {
@@ -315,6 +315,7 @@ body {
         max-width: 100%;
         height: auto;
         break-inside: avoid;
+        padding: 1px;
     }
     
     .quote p {

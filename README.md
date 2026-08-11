@@ -2,7 +2,7 @@
 
 A Python-based static site generator that compiles Markdown stories, images, and slideshows into a single self-contained HTML file with an e-reader style paginated layout. Designed for publishing fiction and creative writing on the web with a clean, distraction-free reading experience.
 
-See in action at <https://suchwasnot.com/>.
+See in action at <https://suchwasnot.com/>. This repository only contains code, not content.
 
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
@@ -23,7 +23,6 @@ This code is partly AI-generated.
 - **Share & follow** — Built-in share dialog (Bluesky, Mastodon, X, Facebook, Reddit, Tumblr, LinkedIn, Email) and social follow links.
 - **SEO** — Open Graph tags, Twitter Cards, JSON-LD structured data.
 - **Google Analytics** — Optional, tracks story views (not individual page turns).
-- **Print/EPUB support** — Separate `print.scss` and `epub.scss` stylesheets for PDF and EPUB generation workflows.
 
 ## Quick start
 
@@ -210,15 +209,6 @@ The build produces a static `output/` directory. Deploy it to any web host:
 - **Static hosting** (GitHub Pages, Netlify, Vercel, etc.) — just upload `output/`
 - **FTP** — upload `output/` to your server
 - **No server-side processing required** — everything is client-side
-
-## EPUB & PDF generation
-
-This generator focuses on the web reading experience. For EPUB and PDF output, the project includes companion stylesheets:
-
-- `styles/epub.scss` — Conservative reflowable EPUB stylesheet
-- `styles/print.scss` — Print stylesheet with mirrored margins, running headers, and page numbers
-
-These can be used with tools like [Pandoc](https://pandoc.org/) or [WeasyPrint](https://weasyprint.org/) to produce downloadable formats from the same Markdown source.
 
 ## License
 

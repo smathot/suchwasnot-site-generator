@@ -16,3 +16,8 @@ artwork/
 .DS_Store
 *~
 .*.swp
+
+
+build.sh
+pull.sh
+upload.sh

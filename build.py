@@ -362,6 +362,54 @@ def build_follow_links(config):
     return links
 
 
+def generate_sitemap(output_dir, canonical_url, lastmod):
+    """Generate a sitemap.xml file in the output directory.
+
+    The site is a single-page application where all stories are sections
+    within one index.html. Since search engines do not index fragment
+    URLs (#slug) as separate pages, the sitemap contains a single entry
+    for the canonical URL.
+    """
+    # Ensure the canonical URL ends with a slash for consistency
+    if not canonical_url.endswith("/"):
+        canonical_url += "/"
+
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{canonical_url}</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+"""
+    sitemap_path = output_dir / "sitemap.xml"
+    with open(sitemap_path, "w") as f:
+        f.write(sitemap)
+    print(f"  ✓ sitemap.xml")
+
+
+def generate_robots(output_dir, canonical_url):
+    """Generate a robots.txt file in the output directory.
+
+    Allows all crawlers and references the sitemap URL.
+    """
+    # Ensure the canonical URL ends with a slash for consistency
+    if not canonical_url.endswith("/"):
+        canonical_url += "/"
+
+    robots = f"""User-agent: *
+Allow: /
+
+Sitemap: {canonical_url}sitemap.xml
+"""
+    robots_path = output_dir / "robots.txt"
+    with open(robots_path, "w") as f:
+        f.write(robots)
+    print(f"  ✓ robots.txt")
+
+
 def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     """Build the complete static site as a single reflowing document."""
     print("Building e-reader site...")
@@ -458,6 +506,10 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
 
     # Copy images to output
     copy_resources(resources_dir, output_dir)
+
+    # Generate sitemap.xml and robots.txt for search engine discovery
+    generate_sitemap(output_dir, metadata["canonical_url"], today.isoformat())
+    generate_robots(output_dir, metadata["canonical_url"])
 
     print(f"\nDone! {len(sections)} section(s) built to {output_path}")
 

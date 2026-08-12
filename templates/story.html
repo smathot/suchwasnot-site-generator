@@ -52,6 +52,29 @@
         }
     }
     </script>
+    
+    {# --- Structured data (JSON-LD): ItemList --- #}
+    {# Tells search engines that this page contains distinct named content
+       items, each accessible via a fragment URL (#slug). While fragment
+       URLs are not indexed as separate pages, this signals their
+       importance and can enable sitelinks/rich results. #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "{{ meta_title }}",
+        "itemListElement": [
+            {% for entry in toc_entries %}
+            {
+                "@type": "ListItem",
+                "position": {{ loop.index }},
+                "name": {{ entry.title | tojson }},
+                "url": "{{ canonical_url }}#{{ entry.slug }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>    
 
     <style>
         {{ compiled_css | safe }}

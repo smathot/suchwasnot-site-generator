@@ -5,6 +5,7 @@ __pycache__/
 # Build output
 output/
 output-download-page/
+example-output
 
 # Private content (actual book content, downloads, source artwork)
 content/

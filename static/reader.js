@@ -7,7 +7,7 @@
 
 (function () {
     "use strict";
-    
+
     let currentPage = 0;
     let pageCount = 1;
     let pageWidth = 0;
@@ -501,12 +501,18 @@
             if (!initialPositionHandled) {
                 initialPositionHandled = true;
 
-                // Priority: cookie > URL hash > start
-                var restoredPage = restoreFromCookie();
-                if (restoredPage !== null) {
-                    goToPage(restoredPage);
-                } else if (location.hash) {
+                // Priority: URL hash > cookie > start
+                // An explicit anchor link (e.g. shared URL with #story-id)
+                // takes precedence over the saved cookie position. The hash
+                // is stripped from the URL afterwards so subsequent reloads
+                // fall back to the cookie.
+                if (location.hash) {
                     goToAnchor(location.hash);
+                } else {
+                    var restoredPage = restoreFromCookie();
+                    if (restoredPage !== null) {
+                        goToPage(restoredPage);
+                    }
                 }
 
                 // Clear any URL hash so it doesn't persist across reloads.

@@ -12,7 +12,7 @@ import shutil
 import uuid
 from datetime import date
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 import yaml
 import markdown
 import sass
@@ -362,32 +362,50 @@ def build_follow_links(config):
     return links
 
 
-def generate_sitemap(output_dir, canonical_url, lastmod):
+def generate_sitemap(output_dir, canonical_url, lastmod, slugs):
     """Generate a sitemap.xml file in the output directory.
 
     The site is a single-page application where all stories are sections
-    within one index.html. Since search engines do not index fragment
-    URLs (#slug) as separate pages, the sitemap contains a single entry
-    for the canonical URL.
+    within one index.html, navigated via fragment identifiers (#slug).
+    To improve search engine discoverability, each story is listed in the
+    sitemap as a /slug URL. The .htaccess file (see generate_htaccess)
+    rewrites these /slug URLs to /#slug so visitors land on the correct
+    story.
     """
     # Ensure the canonical URL ends with a slash for consistency
     if not canonical_url.endswith("/"):
         canonical_url += "/"
 
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>{canonical_url}</loc>
-    <lastmod>{lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>
-"""
+    entries = [
+        "  <url>",
+        f"    <loc>{canonical_url}</loc>",
+        f"    <lastmod>{lastmod}</lastmod>",
+        "    <changefreq>monthly</changefreq>",
+        "    <priority>1.0</priority>",
+        "  </url>",
+    ]
+
+    for slug in slugs:
+        entries.extend([
+            "  <url>",
+            f"    <loc>{canonical_url}{slug}</loc>",
+            f"    <lastmod>{lastmod}</lastmod>",
+            "    <changefreq>monthly</changefreq>",
+            "    <priority>0.8</priority>",
+            "  </url>",
+        ])
+
+    sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "\n".join(entries)
+        + "\n</urlset>\n"
+    )
+
     sitemap_path = output_dir / "sitemap.xml"
     with open(sitemap_path, "w") as f:
         f.write(sitemap)
-    print(f"  ✓ sitemap.xml")
+    print(f"  ✓ sitemap.xml ({len(slugs) + 1} URLs)")
 
 
 def generate_robots(output_dir, canonical_url):
@@ -408,6 +426,44 @@ Sitemap: {canonical_url}sitemap.xml
     with open(robots_path, "w") as f:
         f.write(robots)
     print(f"  ✓ robots.txt")
+
+
+def generate_htaccess(output_dir, canonical_url):
+    """Generate a .htaccess file that rewrites /slug URLs to /#slug.
+
+    Since the site is a single-page application, story URLs like
+    /my-story don't exist as separate pages. This rewrite rule catches
+    any single-segment path that doesn't correspond to a real file or
+    directory and redirects it to the root page with the slug as a
+    fragment identifier, so the reader's JavaScript can navigate to
+    the correct story.
+
+    The NE (noescape) flag prevents Apache from percent-encoding the
+    # character, which would break the fragment.
+    """
+    # Determine the base path from the canonical URL so the rewrite
+    # works correctly even if the site lives in a subdirectory.
+    parsed = urlparse(canonical_url)
+    base = parsed.path or "/"
+    if not base.endswith("/"):
+        base += "/"
+
+    htaccess = (
+        "RewriteEngine On\n"
+        f"RewriteBase {base}\n"
+        "\n"
+        "# Rewrite /slug to /#slug so fragment-based navigation works.\n"
+        "# Only applies to single-segment paths that aren't real files\n"
+        "# or directories (e.g. images, sitemap.xml, robots.txt).\n"
+        "RewriteCond %{REQUEST_FILENAME} !-f\n"
+        "RewriteCond %{REQUEST_FILENAME} !-d\n"
+        f"RewriteRule ^([^/]+)/?$ {base}#$1 [R=302,L,NE]\n"
+    )
+
+    htaccess_path = output_dir / ".htaccess"
+    with open(htaccess_path, "w") as f:
+        f.write(htaccess)
+    print(f"  ✓ .htaccess")
 
 
 def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
@@ -507,9 +563,13 @@ def build(content_dir, templates_dir, styles_dir, static_dir, output_dir):
     # Copy images to output
     copy_resources(resources_dir, output_dir)
 
-    # Generate sitemap.xml and robots.txt for search engine discovery
-    generate_sitemap(output_dir, metadata["canonical_url"], today.isoformat())
+    # Collect all content slugs for the sitemap
+    slugs = list(content.keys())
+
+    # Generate sitemap.xml, robots.txt, and .htaccess
+    generate_sitemap(output_dir, metadata["canonical_url"], today.isoformat(), slugs)
     generate_robots(output_dir, metadata["canonical_url"])
+    generate_htaccess(output_dir, metadata["canonical_url"])
 
     print(f"\nDone! {len(sections)} section(s) built to {output_path}")
 

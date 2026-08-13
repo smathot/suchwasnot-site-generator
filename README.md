@@ -1,8 +1,8 @@
 # Suchwasnot.com — E-Reader Static Site Generator
 
-A Python-based static site generator that compiles Markdown stories, images, and slideshows into a single self-contained HTML file with an e-reader style paginated layout. Designed for publishing fiction and creative writing on the web with a clean, distraction-free reading experience.
+A Python-based static site generator that compiles Markdown stories, images, and slideshows into a single self-contained HTML file with an e-reader style paginated layout. Provides a clean, distraction-free reading experience.
 
-See in action at <https://suchwasnot.com/>. This repository only contains code, not content.
+Designed for <https://suchwasnot.com/>, a site with speculative fiction written by Sebastiaan Mathôt. (This repository only contains code, no content.)
 
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
@@ -23,6 +23,7 @@ This code is partly AI-generated.
 - **Share & follow** — Built-in share dialog (Bluesky, Mastodon, X, Facebook, Reddit, Tumblr, LinkedIn, Email) and social follow links.
 - **SEO** — Open Graph tags, Twitter Cards, JSON-LD structured data.
 - **Google Analytics** — Optional, tracks story views (not individual page turns).
+- **Sitemap** — Stories are exposed as pages (see deployment notes).
 
 ## Quick start
 
@@ -209,6 +210,8 @@ The build produces a static `output/` directory. Deploy it to any web host:
 - **Static hosting** (GitHub Pages, Netlify, Vercel, etc.) — just upload `output/`
 - **FTP** — upload `output/` to your server
 - **No server-side processing required** — everything is client-side
+
+The sitemap exposes stories as pages (e.g. `http://yourdomain.com/story-title`). These should be mapped onto hashes (`http://yourdomain.com/story-title`). For Apache servers, an `.htaccess` is auto-generated for this purposes. For Nginx, you need to manually configure the server to make this work.
 
 ## License
 
